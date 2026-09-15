@@ -20,6 +20,7 @@
 
 const ROUND_SECONDS = 60;
 const MAX_QTY = 5;           // per tile, per side
+const MAX_HINTS = 3;         // per round
 const CLOSEOUT_PENALTY = 3;  // $/share slippage when unhedged positions are force-closed
 const INV_LIMIT = 10;        // market making: max |inventory|
 
@@ -47,19 +48,19 @@ const DIFFICULTY = {
     label: 'Easy',
     blurb: {
       arb: '3 stocks, one listed on two venues, one 2-stock basket. $1–2 edges on the same stock, bigger on baskets. No fees.',
-      mm: 'Mostly noise traders, accurate estimate, calm price. Trader types are shown as they trade.',
+      mm: 'Mostly noise traders, accurate estimate, calm price.',
     },
-    arb: { stocks: 3, dualListings: 1, baskets: 1, basketSize: [2, 2], maxWeight: 1, crossEdge: [1, 2], basketEdge: [3, 6], fee: 0, arbChance: 0.8, trapChance: 0, showLocked: true },
-    mm: { estimateNoise: 1, informed: 0.2, arrivalMs: 3000, drift: 0.25, newsChance: 0, newsJump: [0, 0], noiseTol: [3, 6], maxSize: 1, revealTypes: true },
+    arb: { stocks: 3, dualListings: 1, baskets: 1, basketSize: [2, 2], maxWeight: 1, crossEdge: [1, 2], basketEdge: [3, 6], fee: 0, arbChance: 0.8, trapChance: 0 },
+    mm: { estimateNoise: 1, informed: 0.2, arrivalMs: 3000, drift: 0.25, newsChance: 0, newsJump: [0, 0], noiseTol: [3, 6], maxSize: 1 },
   },
   medium: {
     label: 'Medium',
     blurb: {
       arb: '4 stocks, one on two venues, two baskets of 2–3 stocks. Smaller basket edges. No fees.',
-      mm: 'More informed flow, rougher estimate, occasional news. Trader types revealed after the round.',
+      mm: 'More informed flow, rougher estimate, occasional news.',
     },
-    arb: { stocks: 4, dualListings: 1, baskets: 2, basketSize: [2, 3], maxWeight: 1, crossEdge: [1, 2], basketEdge: [2, 4], fee: 0, arbChance: 0.6, trapChance: 0, showLocked: true },
-    mm: { estimateNoise: 3, informed: 0.35, arrivalMs: 2500, drift: 0.4, newsChance: 0.05, newsJump: [3, 6], noiseTol: [2, 5], maxSize: 1, revealTypes: false },
+    arb: { stocks: 4, dualListings: 1, baskets: 2, basketSize: [2, 3], maxWeight: 1, crossEdge: [1, 2], basketEdge: [2, 4], fee: 0, arbChance: 0.6, trapChance: 0 },
+    mm: { estimateNoise: 3, informed: 0.35, arrivalMs: 2500, drift: 0.4, newsChance: 0.05, newsJump: [3, 6], noiseTol: [2, 5], maxSize: 1 },
   },
   hard: {
     label: 'Hard',
@@ -67,8 +68,8 @@ const DIFFICULTY = {
       arb: '5 stocks, two on two venues, 3-stock baskets with 2× weights. $0.25/share fee — some edges are traps.',
       mm: 'Half the flow is informed, trades up to 2 lots, bigger news moves, faster arrivals.',
     },
-    arb: { stocks: 5, dualListings: 2, baskets: 2, basketSize: [3, 3], maxWeight: 2, crossEdge: [1, 1], basketEdge: [1, 3], fee: 0.25, arbChance: 0.5, trapChance: 0.3, showLocked: false },
-    mm: { estimateNoise: 5, informed: 0.45, arrivalMs: 2000, drift: 0.6, newsChance: 0.07, newsJump: [4, 9], noiseTol: [2, 4], maxSize: 2, revealTypes: false },
+    arb: { stocks: 5, dualListings: 2, baskets: 2, basketSize: [3, 3], maxWeight: 2, crossEdge: [1, 1], basketEdge: [1, 3], fee: 0.25, arbChance: 0.5, trapChance: 0.3 },
+    mm: { estimateNoise: 5, informed: 0.45, arrivalMs: 2000, drift: 0.6, newsChance: 0.07, newsJump: [4, 9], noiseTol: [2, 4], maxSize: 2 },
   },
   expert: {
     label: 'Expert',
@@ -76,8 +77,8 @@ const DIFFICULTY = {
       arb: '6 stocks, three baskets of 3–4 stocks with 2× weights, $0.50/share fee, lots of decoys.',
       mm: 'Mostly informed flow, up to 3 lots, wide estimate, sharp news jumps, fast tape.',
     },
-    arb: { stocks: 6, dualListings: 2, baskets: 3, basketSize: [3, 4], maxWeight: 2, crossEdge: [1, 1], basketEdge: [1, 2], fee: 0.5, arbChance: 0.45, trapChance: 0.35, showLocked: false },
-    mm: { estimateNoise: 8, informed: 0.55, arrivalMs: 1500, drift: 0.8, newsChance: 0.08, newsJump: [5, 12], noiseTol: [1, 4], maxSize: 3, revealTypes: false },
+    arb: { stocks: 6, dualListings: 2, baskets: 3, basketSize: [3, 4], maxWeight: 2, crossEdge: [1, 1], basketEdge: [1, 2], fee: 0.5, arbChance: 0.45, trapChance: 0.35 },
+    mm: { estimateNoise: 8, informed: 0.55, arrivalMs: 1500, drift: 0.8, newsChance: 0.08, newsJump: [5, 12], noiseTol: [1, 4], maxSize: 3 },
   },
 };
 
@@ -92,6 +93,7 @@ const HOWTO = {
       <li><b>Finish flat.</b> Anything unhedged is force-closed at a $${CLOSEOUT_PENALTY}/share penalty.</li>
       <li><b>Fees</b> (Hard+) are charged on every share and basket you trade. Some edges don't survive them.</li>
       <li>No arbitrage on the board? Tap <b>Pass</b>.</li>
+      <li>Stuck? <b>Hint</b> gives up to 3 hints, each more specific. Nothing tells you if you're right until you submit.</li>
     </ul>`,
   mm: `
     <p>You're the market maker for one stock. Its true value is hidden; you get a rough street estimate.</p>
@@ -101,6 +103,7 @@ const HOWTO = {
       <li><b>Informed traders</b> know the true value and only trade when your quote is wrong. Those fills cost you.</li>
       <li>One-sided flow is information: if everyone keeps buying, value is probably higher — shift up.</li>
       <li>Inventory is capped at ±${INV_LIMIT} and marked at the true value at the bell.</li>
+      <li>Stuck? <b>Hint</b> gives up to 3 hints per round, each more specific.</li>
     </ul>`,
 };
 
@@ -319,10 +322,10 @@ function targetProfit(opps, cellCount) {
 // ============================================================
 function startArbRound() {
   const round = genArbRound(diff().arb);
-  state.arb = { ...round, ...findOpportunities(round), qty: round.cells.map(() => ({ buy: 0, sell: 0 })) };
+  state.arb = { ...round, ...findOpportunities(round), qty: round.cells.map(() => ({ buy: 0, sell: 0 })), hints: 0 };
   $('board').classList.remove('locked');
   renderBoard();
-  updatePosition();
+  resetHints('arb');
 }
 
 const stepper = (i, side) => `
@@ -368,7 +371,6 @@ function onBoardClick(e) {
   q[side] = Math.min(MAX_QTY, Math.max(0, q[side] + Number(btn.dataset.d)));
   $(`q-${side}-${i}`).textContent = q[side];
   $(`q-${side}-${i}`).parentElement.classList.toggle('on', q[side] > 0);
-  updatePosition();
 }
 
 function resetArb() {
@@ -380,7 +382,6 @@ function resetArb() {
       $(`q-${side}-${i}`).parentElement.classList.remove('on');
     });
   });
-  updatePosition();
 }
 
 // Cash from trades, fees and net share position per stock (baskets unpacked)
@@ -398,15 +399,34 @@ function arbTotals(a) {
   return { gross: round2(gross), units, fees: round2(units * a.fee), net };
 }
 
-function updatePosition() {
+// Progressive hints, only when asked: count → which tiles → the full trade
+function arbHint() {
   const a = state.arb;
-  const { gross, units, fees, net } = arbTotals(a);
-  const open = net.map((n, i) => (n ? `<span class="pos-item">${badge(a.stocks[i], true)}<b class="${n > 0 ? 'pos' : 'neg'}">${n > 0 ? '+' : ''}${n}</b></span>` : '')).filter(Boolean);
-  let html;
-  if (!units) html = '<span class="dim">No trades yet — you finish flat</span>';
-  else if (open.length) html = `<span class="warn">Unhedged</span>${open.join('')}`;
-  else html = `<span class="ok">Flat ✓</span>` + (a.cfg.showLocked ? `<span class="dim">locks in</span><b class="${pnlClass(gross - fees)}">${money(gross - fees, true)}</b>` : '');
-  $('positionBar').innerHTML = html;
+  if (!a || state.roundOver || a.hints >= MAX_HINTS) return;
+  a.hints += 1;
+  const best = [...a.opps].sort((x, y) => y.net - x.net)[0];
+  const n = a.opps.length;
+  let msg;
+  if (!best) {
+    msg = a.hints === 1
+      ? 'Compare every stock across venues and every basket against the sum of its parts.'
+      : a.hints === 2
+        ? `Remember ${a.fee ? 'fees and ' : ''}that you need to beat the buy price, not the midpoint.`
+        : 'There is no profitable arbitrage on this board.';
+  } else if (a.hints === 1) {
+    msg = `There ${n === 1 ? 'is 1 opportunity' : `are ${n} opportunities`} on this board${a.fee ? ' after fees' : ''}.`;
+  } else if (a.hints === 2) {
+    const cells = [...new Set(best.legs.map(l => l.cell))];
+    cells.forEach(i => $(`tile-${i}`).classList.add('hinted'));
+    const names = cells.map(i => {
+      const c = a.cells[i];
+      return c.type === 'basket' ? c.name : `${a.stocks[c.stock].sym}${c.venue ? ` (${c.venue})` : ''}`;
+    });
+    msg = `The biggest edge involves the highlighted tiles: ${names.join(', ')}.`;
+  } else {
+    msg = `${best.title}: ${best.detail} — ${money(best.net, true)}/unit${a.fee ? ' after fees' : ''}.`;
+  }
+  addHint('arb', a.hints, msg);
 }
 
 function scoreArb(a) {
@@ -476,6 +496,7 @@ function submitArb(timedOut) {
     ${openHtml}
     <h4>Opportunities</h4><ul class="opps">${oppHtml}</ul>
     ${trapHtml ? `<h4>Traps</h4><ul class="opps">${trapHtml}</ul>` : ''}
+    ${a.hints ? `<p class="note">Hints used: ${a.hints}</p>` : ''}
     ${target > 0 ? `<p class="note">Max at ${MAX_QTY} per tile: about ${money(target)} (you captured ${Math.max(0, Math.round((s.total / target) * 100))}%).</p>` : ''}
   `);
 }
@@ -488,7 +509,7 @@ function startMmRound() {
   const t = pick(TICKERS);
   const V = randInt(40, 150);
   const est = Math.round(V + (Math.random() * 2 - 1) * cfg.estimateNoise);
-  state.mm = { cfg, t, V, V0: V, est, bid: est - 2, ask: est + 2, inv: 0, cash: 0, history: [], fills: [] };
+  state.mm = { cfg, t, V, V0: V, est, bid: est - 2, ask: est + 2, inv: 0, cash: 0, history: [], fills: [], hints: 0 };
   const m = state.mm;
   m.history.push({ V, bid: m.bid, ask: m.ask, fill: null });
 
@@ -498,6 +519,7 @@ function startMmRound() {
   $('mmTape').innerHTML = '<div class="tape-row dim">Waiting for the first trader…</div>';
   $('mmNews').hidden = true;
   $('mmView').classList.remove('locked');
+  resetHints('mm');
   renderMm();
   state.arrivalId = setInterval(mmArrival, cfg.arrivalMs);
 }
@@ -564,23 +586,18 @@ function mmArrival() {
     if (want === 'sell' && m.bid >= m.V - tol) side = 'sell';
   }
 
-  const who = cfg.revealTypes ? (informed ? 'Informed ' : 'Noise ') : '';
   let row;
   if (side && Math.abs(m.inv + (side === 'buy' ? -size : size)) > INV_LIMIT) {
-    row = `<div class="tape-row dim">${who}${side}er blocked — you're at the ±${INV_LIMIT} inventory limit</div>`;
+    row = `<div class="tape-row dim">${side === 'buy' ? 'Buyer' : 'Seller'} blocked — you're at the ±${INV_LIMIT} inventory limit</div>`;
     side = null;
   } else if (side === 'buy') {
     m.inv -= size; m.cash += m.ask * size;
     m.fills.push({ side, price: m.ask, size, V: m.V, informed });
-    row = `<div class="tape-row sold"><span>${who}Buyer lifts your ask</span><b>${size} @ ${money(m.ask)}</b></div>`;
+    row = `<div class="tape-row sold"><span>Buyer lifts your ask</span><b>${size} @ ${money(m.ask)}</b></div>`;
   } else if (side === 'sell') {
     m.inv += size; m.cash -= m.bid * size;
     m.fills.push({ side, price: m.bid, size, V: m.V, informed });
-    row = `<div class="tape-row bought"><span>${who}Seller hits your bid</span><b>${size} @ ${money(m.bid)}</b></div>`;
-  } else if (cfg.revealTypes) {
-    row = informed
-      ? '<div class="tape-row dim">Informed trader passes — your quotes bracket fair value</div>'
-      : `<div class="tape-row dim">Noise ${want}er walks — your ${want === 'buy' ? 'ask' : 'bid'} is too far away</div>`;
+    row = `<div class="tape-row bought"><span>Seller hits your bid</span><b>${size} @ ${money(m.bid)}</b></div>`;
   } else {
     row = '<div class="tape-row dim">No trade</div>';
   }
@@ -597,6 +614,29 @@ function mmArrival() {
     box.classList.add('flash');
   }
   renderMm();
+}
+
+function mmHint() {
+  const m = state.mm;
+  if (!m || state.roundOver || m.hints >= MAX_HINTS) return;
+  m.hints += 1;
+  const mid = (m.bid + m.ask) / 2;
+  let msg;
+  if (m.hints === 1) {
+    const recent = m.fills.slice(-6);
+    const buys = recent.filter(f => f.side === 'buy').length;
+    msg = recent.length
+      ? `Last ${recent.length} fills: ${buys} buyer${buys === 1 ? '' : 's'} lifted your ask, ${recent.length - buys} seller${recent.length - buys === 1 ? '' : 's'} hit your bid.`
+      : 'No fills yet. If nobody trades for a while, your spread may be too wide.';
+  } else if (m.hints === 2) {
+    msg = Math.abs(m.V - mid) < 0.5
+      ? 'True value is right around your mid right now.'
+      : `True value is ${m.V > mid ? 'above' : 'below'} your mid right now.`;
+  } else {
+    const lo = Math.floor(m.V) - 2;
+    msg = `True value is between ${money(lo)} and ${money(lo + 4)} right now.`;
+  }
+  addHint('mm', m.hints, msg);
 }
 
 function mmChart(history) {
@@ -650,8 +690,26 @@ function endMmRound() {
       <tr><td>Lost to informed traders (${nInf} fills)</td><td>${money(informedEdge, true)}</td></tr>
       <tr><td>Price moves on inventory (ended ${m.inv > 0 ? '+' : ''}${m.inv})</td><td>${money(inventoryPnl, true)}</td></tr>
     </table>
+    ${m.hints ? `<p class="note">Hints used: ${m.hints}</p>` : ''}
     ${tips.map(t => `<p class="note">${t}</p>`).join('')}
   `);
+}
+
+// -------------------- HINT UI --------------------
+function resetHints(mode) {
+  const box = $(`${mode}Hint`), btn = $(`${mode}HintBtn`);
+  box.innerHTML = '';
+  box.hidden = true;
+  btn.disabled = false;
+  btn.textContent = `Hint (${MAX_HINTS})`;
+}
+
+function addHint(mode, n, msg) {
+  const box = $(`${mode}Hint`), btn = $(`${mode}HintBtn`);
+  box.insertAdjacentHTML('beforeend', `<div><span class="hint-n">Hint ${n}</span><br>${msg}</div>`);
+  box.hidden = false;
+  btn.textContent = n >= MAX_HINTS ? 'No hints left' : `Hint (${MAX_HINTS - n})`;
+  btn.disabled = n >= MAX_HINTS;
 }
 
 // ============================================================
@@ -797,6 +855,8 @@ $('board').addEventListener('click', onBoardClick);
 $('resetBtn').addEventListener('click', resetArb);
 $('passBtn').addEventListener('click', () => { resetArb(); submitArb(false); });
 $('submitBtn').addEventListener('click', () => submitArb(false));
+$('arbHintBtn').addEventListener('click', arbHint);
+$('mmHintBtn').addEventListener('click', mmHint);
 $('mmView').addEventListener('click', onMmControl);
 $('nextBtn').addEventListener('click', nextRound);
 $('againBtn').addEventListener('click', startSession);

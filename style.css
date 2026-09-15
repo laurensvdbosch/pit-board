@@ -262,19 +262,23 @@ button{ font: inherit; color: inherit; touch-action: manipulation; cursor: point
 .stepper.buy.on{ border-color: var(--amber); }
 .stepper.buy.on .qty{ color: var(--amber); }
 
-.position{
+.hint-btn{ color: #8FC7FF; border-color: #3E5A73; }
+.hint-btn:disabled{ opacity: .4; cursor: default; }
+#mmView .hint-btn{ flex: none; padding: 10px 0; }
+.hint-box{
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  min-height: 40px;
+  flex-direction: column;
+  gap: 4px;
   padding: 8px 10px;
-  border: 1px solid var(--panel-border);
+  border: 1px solid #3E5A73;
+  border-left: 3px solid #8FC7FF;
   border-radius: var(--radius);
+  background: #1F2A33;
   font-size: 13px;
-  font-family: var(--mono);
+  line-height: 1.4;
 }
-.pos-item{ display: inline-flex; align-items: center; gap: 4px; }
+.hint-box .hint-n{ font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #8FC7FF; }
+.tile.hinted{ box-shadow: 0 0 0 2px #8FC7FF; }
 
 .controls{
   display: flex;

@@ -82,10 +82,11 @@
     <!-- Arbitrage -->
     <div id="arbView" hidden>
       <main class="board" id="board"></main>
-      <div class="position" id="positionBar"></div>
+      <div class="hint-box" id="arbHint" hidden></div>
       <footer class="controls">
         <button class="btn btn-ghost" id="resetBtn">Reset</button>
         <button class="btn btn-ghost" id="passBtn">Pass</button>
+        <button class="btn btn-ghost hint-btn" id="arbHintBtn">Hint</button>
         <button class="btn btn-primary" id="submitBtn">Submit</button>
       </footer>
     </div>
@@ -122,6 +123,9 @@
         <div><span class="stat-lbl">P&amp;L @ your mid</span><span class="stat-val" id="mmMark">$0</span></div>
       </div>
       <div class="inv-bar"><div class="inv-fill" id="mmInvFill"></div></div>
+
+      <button class="btn btn-ghost hint-btn" id="mmHintBtn">Hint</button>
+      <div class="hint-box" id="mmHint" hidden></div>
 
       <div class="tape" id="mmTape"></div>
     </div>
