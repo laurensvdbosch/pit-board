@@ -1,0 +1,15 @@
+{
+  "name": "Pit Board — Market Making Trainer",
+  "short_name": "Pit Board",
+  "description": "Practice market making and arbitrage with randomized scenarios.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1B1D1F",
+  "theme_color": "#1B1D1F",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

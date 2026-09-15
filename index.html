@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B1D1F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pit Board">
+<title>Pit Board — Market Making Trainer</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ==================== HOME ==================== -->
+  <section id="home" class="screen">
+    <div class="brand">
+      <div class="brand-mark">PIT<span>BOARD</span></div>
+      <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+    </div>
+    <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
+
+    <div class="field">
+      <div class="field-label">Mode</div>
+      <div class="seg seg-2" data-setting="mode">
+        <button data-value="arb"><strong>Arbitrage</strong><small>Spot mispriced quotes &amp; baskets</small></button>
+        <button data-value="mm"><strong>Market Making</strong><small>Quote a bid/ask, manage inventory</small></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Difficulty</div>
+      <div class="seg seg-4" data-setting="difficulty">
+        <button data-value="easy">Easy</button>
+        <button data-value="medium">Medium</button>
+        <button data-value="hard">Hard</button>
+        <button data-value="expert">Expert</button>
+      </div>
+      <p class="field-help" id="diffDesc"></p>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Rounds</div>
+      <div class="seg seg-4" data-setting="rounds">
+        <button data-value="3">3</button>
+        <button data-value="5">5</button>
+        <button data-value="10">10</button>
+        <button data-value="20">20</button>
+      </div>
+    </div>
+
+    <div class="best-line" id="bestLine"></div>
+    <button class="btn btn-primary btn-start" id="startBtn">Start</button>
+
+    <details class="howto">
+      <summary>How to play</summary>
+      <div id="howtoText"></div>
+    </details>
+  </section>
+
+  <!-- ==================== GAME ==================== -->
+  <section id="game" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="quitBtn" aria-label="Quit to menu">✕</button>
+      <div class="round-indicator" id="roundIndicator"></div>
+      <div class="timer" id="timer">1:00</div>
+    </header>
+
+    <div class="score-strip">
+      <div>
+        <span class="score-label">Session P&amp;L</span>
+        <span class="score-value" id="totalScore">$0</span>
+      </div>
+      <span class="chip" id="feeChip" hidden></span>
+    </div>
+
+    <!-- Arbitrage -->
+    <div id="arbView" hidden>
+      <main class="board" id="board"></main>
+      <div class="position" id="positionBar"></div>
+      <footer class="controls">
+        <button class="btn btn-ghost" id="resetBtn">Reset</button>
+        <button class="btn btn-ghost" id="passBtn">Pass</button>
+        <button class="btn btn-primary" id="submitBtn">Submit</button>
+      </footer>
+    </div>
+
+    <!-- Market making -->
+    <div id="mmView" hidden>
+      <div class="mm-stock">
+        <div class="mm-head"><span id="mmBadge"></span><span class="mm-name" id="mmName"></span></div>
+        <div class="mm-est">Street estimate <strong id="mmEst"></strong></div>
+      </div>
+      <div class="news" id="mmNews" hidden></div>
+
+      <div class="mm-quote">
+        <div class="q-side bid" id="mmBidBox">
+          <div class="q-lbl">Your bid <small>(you buy)</small></div>
+          <div class="q-px" id="mmBid"></div>
+          <div class="q-step"><button data-mm="bid-" aria-label="Lower bid">−</button><button data-mm="bid+" aria-label="Raise bid">+</button></div>
+        </div>
+        <div class="q-spread"><span id="mmSpread"></span><small>spread</small></div>
+        <div class="q-side ask" id="mmAskBox">
+          <div class="q-lbl">Your ask <small>(you sell)</small></div>
+          <div class="q-px" id="mmAsk"></div>
+          <div class="q-step"><button data-mm="ask-" aria-label="Lower ask">−</button><button data-mm="ask+" aria-label="Raise ask">+</button></div>
+        </div>
+      </div>
+      <div class="mm-shift">
+        <button class="btn btn-ghost" data-mm="shift-">◀ Shift both down</button>
+        <button class="btn btn-ghost" data-mm="shift+">Shift both up ▶</button>
+      </div>
+
+      <div class="mm-stats">
+        <div><span class="stat-lbl">Inventory</span><span class="stat-val" id="mmInv">0</span></div>
+        <div><span class="stat-lbl">Cash</span><span class="stat-val" id="mmCash">$0</span></div>
+        <div><span class="stat-lbl">P&amp;L @ your mid</span><span class="stat-val" id="mmMark">$0</span></div>
+      </div>
+      <div class="inv-bar"><div class="inv-fill" id="mmInvFill"></div></div>
+
+      <div class="tape" id="mmTape"></div>
+    </div>
+
+    <!-- Round result sheet -->
+    <div class="sheet" id="roundSheet" hidden>
+      <div class="sheet-body" id="sheetBody"></div>
+      <button class="btn btn-primary" id="nextBtn">Next round</button>
+    </div>
+  </section>
+
+  <!-- ==================== RESULTS ==================== -->
+  <section id="results" class="screen" hidden>
+    <div class="results-card">
+      <div class="field-label" id="resultsSub"></div>
+      <h1>Session complete</h1>
+      <div class="big-pnl" id="resultsTotal"></div>
+      <div class="best-line" id="resultsBest"></div>
+      <div class="round-bars" id="resultsRounds"></div>
+      <div class="controls">
+        <button class="btn btn-ghost" id="menuBtn">Menu</button>
+        <button class="btn btn-primary" id="againBtn">Play again</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
