@@ -159,7 +159,8 @@ const badge = (t, small = false) =>
 
 // -------------------- STATE --------------------
 const settings = Object.assign(
-  { mode: 'arb', difficulty: 'easy', rounds: 5, digits: 'fwd-easy', switchMode: 'standard', switchSecs: 60, lastGame: 'arb' },
+  { mode: 'arb', difficulty: 'easy', rounds: 5, digits: 'fwd-easy', switchMode: 'standard', switchSecs: 60, switchFeedback: true,
+    confirmLen: 'easy', confirmSpeed: 1, lastGame: 'arb' },
   store.get('pitboard-settings', {}),
 );
 if (!MODE_LABEL[settings.mode]) settings.mode = 'arb';
@@ -168,7 +169,10 @@ if (![3, 5, 10, 20].includes(settings.rounds)) settings.rounds = 5;
 if (!['fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard'].includes(settings.digits)) settings.digits = 'fwd-easy';
 if (!['standard', 'hard', 'super'].includes(settings.switchMode)) settings.switchMode = 'standard';
 if (![30, 60, 120].includes(settings.switchSecs)) settings.switchSecs = 60;
-if (!['arb', 'mm', 'digits', 'switch'].includes(settings.lastGame)) settings.lastGame = 'arb';
+if (typeof settings.switchFeedback !== 'boolean') settings.switchFeedback = true;
+if (!['easy', 'hard'].includes(settings.confirmLen)) settings.confirmLen = 'easy';
+if (![1, 2, 3].includes(settings.confirmSpeed)) settings.confirmSpeed = 1;
+if (!['arb', 'mm', 'digits', 'switch', 'confirm'].includes(settings.lastGame)) settings.lastGame = 'arb';
 
 const state = {
   round: 0,

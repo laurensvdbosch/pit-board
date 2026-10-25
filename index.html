@@ -238,6 +238,13 @@
           <button data-value="120">120s</button>
         </div>
       </div>
+      <div class="field">
+        <div class="field-label">Instant feedback</div>
+        <div class="seg seg-2" data-sw="fb">
+          <button data-value="on"><strong>On</strong><small>✓ / ✗ and live score after every answer</small></button>
+          <button data-value="off"><strong>Off</strong><small>Nothing until the results screen</small></button>
+        </div>
+      </div>
       <div class="best-line" id="swBest"></div>
       <button class="btn btn-primary btn-start" id="swStart">Start</button>
       <button class="btn btn-ghost btn-leaders" id="swLeaders">🏆 Leaderboard</button>
@@ -264,7 +271,7 @@
       <div class="timer" id="swTimer">1:00</div>
     </header>
     <div class="sw-hud">
-      <span class="score-label">Score <b id="swScore">0</b></span>
+      <span class="score-label"><span id="swScoreLbl">Score</span> <b id="swScore">0</b></span>
       <span class="sw-streak" id="swStreak"></span>
     </div>
     <div class="sw-stage" id="swStage">
@@ -279,7 +286,71 @@
     </div>
   </section>
 
-  <!-- ==================== SHARED SUMMARY (digits, switch) ==================== -->
+  <!-- ==================== TRADE CONFIRM ==================== -->
+  <section id="confirmSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">CNFM · Trade Confirm</div>
+    </header>
+    <div class="setup-body">
+      <div class="field">
+        <div class="field-label">Code length</div>
+        <div class="seg seg-2" data-cf="len">
+          <button data-value="easy"><strong>Easy</strong><small>6–7 characters</small></button>
+          <button data-value="hard"><strong>Hard</strong><small>8–9 characters</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Speed</div>
+        <div class="seg seg-3" data-cf="speed">
+          <button data-value="1"><strong>Normal</strong><small>−0.1s per match</small></button>
+          <button data-value="2"><strong>Fast</strong><small>−0.2s per match</small></button>
+          <button data-value="3"><strong>Very fast</strong><small>−0.3s per match</small></button>
+        </div>
+      </div>
+      <div class="best-line" id="cfBest"></div>
+      <button class="btn btn-primary btn-start" id="cfStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="cfLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <p>The order ticket ID is at the top. Four trade confirmations are below — only one matches exactly.</p>
+          <ul>
+            <li>Tap the exact match (or press <b>1–4</b> on a keyboard).</li>
+            <li>Decoys differ by one character: look-alikes like <b>0/O</b>, <b>1/I</b>, <b>5/S</b>, <b>8/B</b>, or two neighbours swapped.</li>
+            <li>You start with 5 seconds per ticket. Every match takes 0.1s, 0.2s or 0.3s off the clock, down to 0.6s.</li>
+            <li>You have <b>3 lives</b>. A wrong tap or running out of time costs one.</li>
+            <li>Score = number of matches.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="confirmPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="cfQuit" aria-label="Quit run">✕</button>
+      <div class="round-indicator" id="cfInfo"></div>
+      <div class="timer" id="cfScore">0</div>
+    </header>
+    <div class="cf-body">
+      <div class="cf-hud">
+        <div class="cf-lives" id="cfLives" aria-label="Lives"></div>
+        <span class="cf-clock-txt" id="cfClock">5.0s</span>
+      </div>
+      <div class="cf-clock"><div class="cf-bar" id="cfBar"></div></div>
+      <div class="cf-ticket">
+        <span class="sw-lbl">Order ticket · ID</span>
+        <div class="cf-code" id="cfCode"></div>
+      </div>
+      <div class="book">
+        <div class="book-head cf-head"><span>#</span><span>Confirmations</span><span>Tap the match</span></div>
+        <div id="cfOptions"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SHARED SUMMARY (digits, switch, confirm) ==================== -->
   <section id="summary" class="screen" hidden>
     <div class="results-card">
       <div class="field-label" id="summarySub"></div>
@@ -354,6 +425,7 @@
 <script src="games.js"></script>
 <script src="digits.js"></script>
 <script src="switch.js"></script>
+<script src="confirm.js"></script>
 <script src="online.js"></script>
 </body>
 </html>

@@ -32,7 +32,7 @@ const Switch = (() => {
 
   // -------------------- SETUP --------------------
   function renderSetup() {
-    const vals = { mode: settings.switchMode, secs: String(settings.switchSecs) };
+    const vals = { mode: settings.switchMode, secs: String(settings.switchSecs), fb: settings.switchFeedback ? 'on' : 'off' };
     document.querySelectorAll('#switchSetup .seg[data-sw]').forEach(seg => {
       seg.querySelectorAll('button').forEach(b => {
         const on = vals[seg.dataset.sw] === b.dataset.value;
@@ -96,6 +96,15 @@ const Switch = (() => {
   function updateHud() {
     $('swTimer').textContent = clock(s.timeLeft);
     $('swTimer').classList.toggle('low', s.timeLeft <= 5);
+    if (!s.feedback) {
+      // Feedback off: nothing that gives away right or wrong until the results
+      $('swScoreLbl').textContent = 'Trial';
+      $('swScore').textContent = s.trials.length + 1;
+      $('swScore').className = '';
+      $('swStreak').textContent = '';
+      return;
+    }
+    $('swScoreLbl').textContent = 'Score';
     $('swScore').textContent = `${s.score > 0 ? '+' : ''}${s.score}`;
     $('swScore').className = pnlClass(s.score);
     $('swStreak').textContent = s.streak >= 3 ? `🔥 ${s.streak} streak` : '';
@@ -120,7 +129,7 @@ const Switch = (() => {
     stop();
     const mode = settings.switchMode;
     s = {
-      mode, cfg: MODES[mode], secs: settings.switchSecs, timeLeft: settings.switchSecs,
+      mode, cfg: MODES[mode], secs: settings.switchSecs, timeLeft: settings.switchSecs, feedback: settings.switchFeedback,
       trials: [], score: 0, streak: 0, bestStreak: 0, oddLeft: true,
       phase: 'ready', timers: [], clock: null, cur: null, t0: 0, deadline: null,
     };
@@ -204,8 +213,10 @@ const Switch = (() => {
       later(FEEDBACK_MS, () => key.classList.remove('pressed'));
     }
     clearStage();
-    setCue(`mark ${ok ? 'ok' : 'bad'}`, ok ? '✓' : side ? '✗' : 'Too slow');
-    later(FEEDBACK_MS, () => setCue(''));
+    if (s.feedback) {
+      setCue(`mark ${ok ? 'ok' : 'bad'}`, ok ? '✓' : side ? '✗' : 'Too slow');
+      later(FEEDBACK_MS, () => setCue(''));
+    }
     later(FEEDBACK_MS + ITI_MS, nextTrial);
   }
 
@@ -310,6 +321,7 @@ const Switch = (() => {
       const b = e.target.closest('button[data-value]');
       if (!b) return;
       if (seg.dataset.sw === 'mode') settings.switchMode = b.dataset.value;
+      else if (seg.dataset.sw === 'fb') settings.switchFeedback = b.dataset.value === 'on';
       else settings.switchSecs = Number(b.dataset.value);
       saveSettings();
       renderSetup();

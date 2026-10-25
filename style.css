@@ -787,3 +787,54 @@ button{ font: inherit; color: inherit; touch-action: manipulation; cursor: point
 .lg.neg-lg::before{ background: var(--loss); }
 .lg.slow-lg::before{ background: #7A7D80; }
 .lg.tick-lg::before{ background: var(--amber); height: 3px; }
+
+/* -------------------- TRADE CONFIRM -------------------- */
+.seg-5{ grid-template-columns: repeat(5, 1fr); }
+.seg-5 button{ font-size: 12px !important; padding-inline: 2px !important; }
+.cf-body{ display: flex; flex-direction: column; gap: 12px; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); }
+.cf-hud{ display: flex; justify-content: space-between; align-items: center; }
+.cf-lives{ display: flex; gap: 6px; }
+.cf-lives .life{ width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--loss); }
+.cf-lives .life.on{ background: var(--loss); }
+.cf-clock-txt{ font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--amber); font-variant-numeric: tabular-nums; }
+.cf-clock{ height: 6px; background: var(--panel); border-radius: 3px; overflow: hidden; }
+.cf-bar{ height: 100%; width: 100%; background: var(--amber); }
+.cf-bar.low{ background: var(--loss); }
+.cf-ticket{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 10px;
+  background: #121416;
+  border: 1px solid var(--amber);
+  border-radius: var(--radius);
+}
+.cf-code{ font-family: var(--mono); font-size: 34px; font-weight: 700; letter-spacing: .12em; color: var(--amber); }
+.cf-head{ grid-template-columns: 30px 1fr auto; }
+.cf-opt{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px;
+  background: var(--panel);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  text-align: left;
+  user-select: none;
+}
+.cf-opt:nth-child(even){ background: #2A2D30; }
+.cf-opt:last-child{ border-bottom: none; }
+.cf-opt:active{ background: #33373A; }
+.cf-key{ font-family: var(--mono); font-size: 12px; color: var(--chalk-dim); }
+.cf-val{ font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: .12em; }
+.cf-opt.ok{ background: color-mix(in srgb, var(--gain) 30%, var(--panel)); }
+.cf-opt.ok .cf-val{ color: var(--gain); }
+.cf-opt.bad{ background: color-mix(in srgb, var(--loss) 30%, var(--panel)); }
+.cf-opt.bad .cf-val{ color: #F08A7B; }
+@media (max-width: 360px){
+  .cf-code{ font-size: 28px; }
+  .cf-val{ font-size: 22px; }
+}

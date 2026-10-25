@@ -5,6 +5,7 @@
    - arb / mm:  difficulty easy…expert, rounds 3/5/10/20
    - digits:    difficulty fwd-easy | fwd-hard | bwd-easy | bwd-hard, rounds 0
    - switch:    difficulty standard | hard | super, rounds = seconds 30/60/120
+   - confirm:   difficulty easy | hard (code length), rounds = clock step 1/2/3 (×0.1 s)
    The server validates the same combinations (supabase/schema.sql).
    Loaded after app.js; digits.js, switch.js and online.js use this.
    =========================================================== */
@@ -44,12 +45,22 @@ const GAMES = {
     ],
     fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
   },
+  confirm: {
+    sym: 'CNFM', short: 'Confirm', name: 'Trade Confirm', color: '#45C4B0',
+    blurb: 'Match the ticket ID before the clock',
+    filters: [
+      { key: 'difficulty', options: [['easy', 'Easy · 6–7'], ['hard', 'Hard · 8–9']] },
+      { key: 'rounds', options: [[1, 'Normal'], [2, 'Fast'], [3, 'Very fast']] },
+    ],
+    fmt: s => `${s} match${Number(s) === 1 ? '' : 'es'}`,
+  },
 };
 
 // The board each game is currently set to on this device
 function currentBoard(game) {
   if (game === 'digits') return { mode: 'digits', difficulty: settings.digits, rounds: 0 };
   if (game === 'switch') return { mode: 'switch', difficulty: settings.switchMode, rounds: settings.switchSecs };
+  if (game === 'confirm') return { mode: 'confirm', difficulty: settings.confirmLen, rounds: settings.confirmSpeed };
   return { mode: game, difficulty: settings.difficulty, rounds: settings.rounds };
 }
 
@@ -64,7 +75,7 @@ function boardLabel(b) {
 }
 
 const fmtScore = (mode, s) => (GAMES[mode] ? GAMES[mode].fmt(Number(s)) : String(s));
-const scoreClass = (mode, s) => (mode === 'digits' ? '' : pnlClass(Number(s)));
+const scoreClass = (mode, s) => (mode === 'digits' || mode === 'confirm' ? '' : pnlClass(Number(s)));
 const boardBestKey = b => `pitboard-best-${b.mode}-${b.difficulty}-${b.rounds}`;
 
 // Local personal best per board (works offline, mirrors the server)
@@ -107,7 +118,7 @@ function openGame(id) {
     showScreen('tradeSetup');
   } else {
     saveSettings();
-    (id === 'digits' ? Digits : Switch).openSetup();
+    ({ digits: Digits, switch: Switch, confirm: Confirm })[id].openSetup();
   }
 }
 
