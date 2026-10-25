@@ -1,6 +1,6 @@
 // Network-first so a new deploy shows up on the next open; cache is the offline fallback.
-const CACHE = 'pitboard-v2';
-const ASSETS = ['./', 'index.html', 'style.css', 'app.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'pitboard-v3';
+const ASSETS = ['./', 'index.html', 'style.css', 'app.js', 'online.js', 'config.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));

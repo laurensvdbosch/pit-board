@@ -716,7 +716,7 @@ function addHint(mode, n, msg) {
 //  SESSION FLOW
 // ============================================================
 function showScreen(id) {
-  ['home', 'game', 'results'].forEach(s => { $(s).hidden = s !== id; });
+  document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
   window.scrollTo(0, 0);
 }
 
@@ -803,6 +803,7 @@ function endSession() {
       <div class="rb-track"><div class="rb-bar ${r >= 0 ? 'pos' : 'neg'}" style="width:${(Math.abs(r) / maxAbs) * 100}%"></div></div>
       <span class="rb-v ${pnlClass(r)}">${money(r, true)}</span></div>`).join('');
   showScreen('results');
+  if (typeof Online !== 'undefined') Online.recordSession(total);
 }
 
 function quitSession() {
@@ -815,7 +816,7 @@ function quitSession() {
 
 // -------------------- HOME --------------------
 function renderHome() {
-  document.querySelectorAll('.seg').forEach(seg => {
+  document.querySelectorAll('.seg[data-setting]').forEach(seg => {
     const key = seg.dataset.setting;
     seg.querySelectorAll('button').forEach(b => {
       const on = String(settings[key]) === b.dataset.value;
@@ -827,6 +828,7 @@ function renderHome() {
   $('howtoText').innerHTML = HOWTO[settings.mode];
   const best = store.get(bestKey(), null);
   $('bestLine').textContent = best === null ? 'No sessions at this setting yet' : `Best at this setting: ${money(best, true)}`;
+  if (typeof Online !== 'undefined') Online.homeExtras();
 }
 
 function buildTape() {
@@ -839,7 +841,7 @@ function buildTape() {
 }
 
 // -------------------- INIT --------------------
-document.querySelectorAll('.seg').forEach(seg => {
+document.querySelectorAll('.seg[data-setting]').forEach(seg => {
   seg.addEventListener('click', e => {
     const btn = e.target.closest('button[data-value]');
     if (!btn) return;

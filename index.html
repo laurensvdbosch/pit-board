@@ -20,8 +20,11 @@
   <!-- ==================== HOME ==================== -->
   <section id="home" class="screen">
     <div class="brand">
-      <div class="brand-mark">PIT<span>BOARD</span></div>
-      <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+      <div>
+        <div class="brand-mark">PIT<span>BOARD</span></div>
+        <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+      </div>
+      <button class="player-chip" id="playerChip" title="Change name"><span class="player-dot"></span><span id="playerName"></span></button>
     </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
 
@@ -56,6 +59,12 @@
 
     <div class="best-line" id="bestLine"></div>
     <button class="btn btn-primary btn-start" id="startBtn">Start</button>
+    <button class="btn btn-ghost btn-leaders" id="leadersBtn">🏆 Leaderboard</button>
+
+    <div class="feed" id="homeFeed" hidden>
+      <div class="field-label">Fresh bests</div>
+      <ul class="feed-list" id="homeFeedList"></ul>
+    </div>
 
     <details class="howto">
       <summary>How to play</summary>
@@ -137,6 +146,57 @@
     </div>
   </section>
 
+  <!-- ==================== REGISTER ==================== -->
+  <section id="register" class="screen" hidden>
+    <div class="brand">
+      <div>
+        <div class="brand-mark">PIT<span>BOARD</span></div>
+        <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+      </div>
+    </div>
+    <form class="register-card" id="registerForm" novalidate>
+      <label class="field-label" for="nameInput" id="registerTitle">Choose your trader name</label>
+      <input class="name-input" id="nameInput" maxlength="20" autocomplete="nickname" autocapitalize="words" spellcheck="false" placeholder="e.g. PitBoss">
+      <p class="field-help">Shown on the public leaderboard. No email or password needed.</p>
+      <p class="form-error" id="registerError" hidden></p>
+      <button class="btn btn-primary" type="submit" id="registerBtn">Join the pit</button>
+      <button class="btn btn-ghost" type="button" id="registerCancel" hidden>Cancel</button>
+    </form>
+  </section>
+
+  <!-- ==================== LEADERBOARD ==================== -->
+  <section id="leaders" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="leadersBack" aria-label="Back to menu">←</button>
+      <div class="round-indicator">Leaderboard</div>
+    </header>
+    <div class="leaders-body">
+      <div class="seg seg-2 lb-tabs" data-lb="tab">
+        <button data-value="top">Top scores</button>
+        <button data-value="feed">Recent bests</button>
+      </div>
+      <div class="lb-filters" id="lbFilters">
+        <div class="seg seg-2" data-lb="mode">
+          <button data-value="arb">Arbitrage</button>
+          <button data-value="mm">Market Making</button>
+        </div>
+        <div class="seg seg-4" data-lb="difficulty">
+          <button data-value="easy">Easy</button>
+          <button data-value="medium">Medium</button>
+          <button data-value="hard">Hard</button>
+          <button data-value="expert">Expert</button>
+        </div>
+        <div class="seg seg-4" data-lb="rounds">
+          <button data-value="3">3 rds</button>
+          <button data-value="5">5 rds</button>
+          <button data-value="10">10 rds</button>
+          <button data-value="20">20 rds</button>
+        </div>
+      </div>
+      <div id="lbList"></div>
+    </div>
+  </section>
+
   <!-- ==================== RESULTS ==================== -->
   <section id="results" class="screen" hidden>
     <div class="results-card">
@@ -144,7 +204,9 @@
       <h1>Session complete</h1>
       <div class="big-pnl" id="resultsTotal"></div>
       <div class="best-line" id="resultsBest"></div>
+      <div class="rank-line" id="resultsRank"></div>
       <div class="round-bars" id="resultsRounds"></div>
+      <button class="btn btn-ghost btn-leaders" id="resultsLeadersBtn">🏆 Leaderboard</button>
       <div class="controls">
         <button class="btn btn-ghost" id="menuBtn">Menu</button>
         <button class="btn btn-primary" id="againBtn">Play again</button>
@@ -154,6 +216,8 @@
 
 </div>
 
+<script src="config.js"></script>
 <script src="app.js"></script>
+<script src="online.js"></script>
 </body>
 </html>
