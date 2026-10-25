@@ -23,13 +23,23 @@ create table if not exists public.player_secrets (
 
 create table if not exists public.best_scores (
   player_id uuid not null references public.players (id) on delete cascade,
-  mode text not null check (mode in ('arb', 'mm')),
-  difficulty text not null check (difficulty in ('easy', 'medium', 'hard', 'expert')),
-  rounds int not null check (rounds in (3, 5, 10, 20)),
+  mode text not null,
+  difficulty text not null,
+  rounds int not null,
   score numeric(12, 2) not null,
   achieved_at timestamptz not null default now(),
   primary key (player_id, mode, difficulty, rounds)
 );
+-- Which boards exist (re-run safe: replaces the older arb/mm-only checks)
+alter table public.best_scores drop constraint if exists best_scores_mode_check;
+alter table public.best_scores drop constraint if exists best_scores_difficulty_check;
+alter table public.best_scores drop constraint if exists best_scores_rounds_check;
+alter table public.best_scores add constraint best_scores_mode_check
+  check (mode in ('arb', 'mm', 'digits', 'switch'));
+alter table public.best_scores add constraint best_scores_difficulty_check
+  check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super'));
+alter table public.best_scores add constraint best_scores_rounds_check
+  check (rounds in (0, 3, 5, 10, 20, 30, 60, 120));
 create index if not exists best_scores_board on public.best_scores (mode, difficulty, rounds, score desc);
 
 -- One row each time someone beats their own best: the "Recent bests" feed
@@ -130,13 +140,16 @@ declare
   v_prev numeric;
 begin
   perform pb_check_secret(p_player, p_secret);
-  if p_mode not in ('arb', 'mm')
-     or p_difficulty not in ('easy', 'medium', 'hard', 'expert')
-     or p_rounds not in (3, 5, 10, 20) then
-    raise exception 'invalid_board';
-  end if;
-  -- The game runs on the phone, so this only stops absurd numbers
-  if v_score is null or abs(v_score) > 2000 * p_rounds then
+  -- Each game's boards, plus loose score bounds. The games run on the
+  -- phone, so the bounds only stop absurd numbers.
+  if v_score is null or not coalesce(
+       (p_mode in ('arb', 'mm') and p_difficulty in ('easy', 'medium', 'hard', 'expert')
+          and p_rounds in (3, 5, 10, 20) and abs(v_score) <= 2000 * p_rounds)
+    or (p_mode = 'digits' and p_difficulty in ('fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard')
+          and p_rounds = 0 and v_score = trunc(v_score) and v_score between 0 and 20)
+    or (p_mode = 'switch' and p_difficulty in ('standard', 'hard', 'super')
+          and p_rounds in (30, 60, 120) and v_score = trunc(v_score) and v_score between -10 * p_rounds and 2 * p_rounds),
+     false) then
     raise exception 'invalid_score';
   end if;
 

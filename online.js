@@ -24,11 +24,10 @@ const Online = (() => {
   let profile = store.get('pitboard-profile', null);   // { name, id?, secret? } — no id = not registered yet
   let registerMode = 'join';
   let flushing = null;
-  const lb = { tab: 'top', mode: settings.mode, difficulty: settings.difficulty, rounds: settings.rounds };
+  const lb = { tab: 'top', ...currentBoard(settings.lastGame) };
 
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const saveProfile = () => store.set('pitboard-profile', profile);
-  const boardLabel = (mode, d, r) => `${MODE_LABEL[mode] || mode} · ${(DIFFICULTY[d] || {}).label || d} · ${r} rounds`;
 
   function ago(iso) {
     const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
@@ -83,7 +82,7 @@ const Online = (() => {
     const queue = store.get('pitboard-pending', []);
     try {
       for (let i = 0; i < localStorage.length; i++) {
-        const m = /^pitboard-best-(arb|mm)-(easy|medium|hard|expert)-(\d+)$/.exec(localStorage.key(i));
+        const m = /^pitboard-best-([a-z]+)-([a-z-]+)-(\d+)$/.exec(localStorage.key(i));
         const score = m && store.get(m[0], null);
         if (typeof score === 'number') queue.push({ mode: m[1], difficulty: m[2], rounds: Number(m[3]), score });
       }
@@ -141,8 +140,7 @@ const Online = (() => {
     } finally {
       btn.disabled = false;
     }
-    showScreen('home');
-    renderHome();
+    goHome();
     flush();
   }
 
@@ -189,13 +187,13 @@ const Online = (() => {
     return flushing;
   }
 
-  async function recordSession(total) {
-    const s = { mode: settings.mode, difficulty: settings.difficulty, rounds: settings.rounds, score: total };
+  // Queue a finished run and show where it ranks on its board in `el`
+  async function recordScore(board, score, el) {
+    const s = { mode: board.mode, difficulty: board.difficulty, rounds: board.rounds, score };
     const queue = store.get('pitboard-pending', []);
     queue.push(s);
     store.set('pitboard-pending', queue);
 
-    const el = $('resultsRank');
     el.textContent = '';
     if (!enabled) return;
     el.textContent = 'Posting to the leaderboard…';
@@ -222,9 +220,9 @@ const Online = (() => {
         <div>
           <b>${esc(e.players ? e.players.name : 'Unknown')}</b>${fresh ? '<span class="new-tag">NEW</span>' : ''}
           <span class="dim">${e.prev_score === null ? 'first score' : 'new best'}</span><br>
-          <small>${boardLabel(e.mode, e.difficulty, e.rounds)} · ${ago(e.created_at)}</small>
+          <small>${boardLabel(e)} · ${ago(e.created_at)}</small>
         </div>
-        <span class="feed-score ${pnlClass(e.score)}">${money(e.score, true)}</span>
+        <span class="feed-score ${scoreClass(e.mode, e.score)}">${fmtScore(e.mode, e.score)}</span>
       </li>`;
   }
 
@@ -234,11 +232,11 @@ const Online = (() => {
       <li class="lb-row${mine ? ' me' : ''}">
         <span class="lb-rank">${['🥇', '🥈', '🥉'][i] || i + 1}</span>
         <span class="lb-name">${esc(r.players ? r.players.name : 'Unknown')}${mine ? ' <small>(you)</small>' : ''}</span>
-        <span class="lb-score ${pnlClass(r.score)}">${money(r.score, true)}</span>
+        <span class="lb-score ${scoreClass(lb.mode, r.score)}">${fmtScore(lb.mode, r.score)}</span>
       </li>`;
   }
 
-  // Called from app.js renderHome()
+  // Called from renderLobby()
   async function homeExtras() {
     if (!profile) { showRegister('join'); return; }
     $('playerName').textContent = profile.name;
@@ -246,23 +244,40 @@ const Online = (() => {
     const box = $('homeFeed');
     if (!enabled) { box.hidden = true; return; }
     try {
-      const rows = await fetchFeed(5);
+      const rows = await fetchFeed(30);
       $('homeFeedList').innerHTML = rows.length
-        ? rows.map(feedRow).join('')
+        ? rows.slice(0, 5).map(feedRow).join('')
         : '<li class="feed-row dim">No scores yet — be the first on the board.</li>';
       box.hidden = false;
+      // NEW tag per game: friends' bests since your last visit
+      Object.keys(GAMES).forEach(id => {
+        const n = rows.filter(e => e.mode === id && e.player_id !== profile.id && new Date(e.created_at).getTime() > seenAt).length;
+        const tag = $(`new-${id}`);
+        if (tag) { tag.textContent = `${n} NEW`; tag.hidden = !n; }
+      });
     } catch {
       box.hidden = true;
     }
   }
 
-  function openLeaders() {
-    Object.assign(lb, { mode: settings.mode, difficulty: settings.difficulty, rounds: settings.rounds });
+  function openLeaders(board) {
+    Object.assign(lb, board || currentBoard(settings.lastGame));
     showScreen('leaders');
     renderLeaders();
   }
 
+  // Game picker plus that game's own filters
+  function renderFilters() {
+    $('lbFilters').innerHTML = `
+      <div class="seg seg-4" data-lb="mode">${Object.entries(GAMES).map(([id, g]) => `<button data-value="${id}">${g.short}</button>`).join('')}</div>
+      ${GAMES[lb.mode].filters.map(f => `
+        <div class="seg seg-${f.options.length}" data-lb="${f.key}">
+          ${f.options.map(([v, label]) => `<button data-value="${v}">${label}</button>`).join('')}
+        </div>`).join('')}`;
+  }
+
   async function renderLeaders() {
+    renderFilters();
     document.querySelectorAll('#leaders .seg[data-lb]').forEach(seg => {
       seg.querySelectorAll('button').forEach(b => {
         const on = String(lb[seg.dataset.lb]) === b.dataset.value;
@@ -301,19 +316,16 @@ const Online = (() => {
 
   // -------------------- INIT --------------------
   $('registerForm').addEventListener('submit', onRegisterSubmit);
-  $('registerCancel').addEventListener('click', () => { showScreen('home'); renderHome(); });
+  $('registerCancel').addEventListener('click', goHome);
   $('playerChip').addEventListener('click', () => showRegister('rename'));
-  $('leadersBtn').addEventListener('click', openLeaders);
-  $('resultsLeadersBtn').addEventListener('click', openLeaders);
-  $('leadersBack').addEventListener('click', () => { showScreen('home'); renderHome(); });
-  document.querySelectorAll('#leaders .seg[data-lb]').forEach(seg => {
-    seg.addEventListener('click', e => {
-      const b = e.target.closest('button[data-value]');
-      if (!b) return;
-      const key = seg.dataset.lb;
-      lb[key] = key === 'rounds' ? Number(b.dataset.value) : b.dataset.value;
-      renderLeaders();
-    });
+  $('leadersBack').addEventListener('click', goHome);
+  $('leaders').addEventListener('click', e => {
+    const b = e.target.closest('.seg[data-lb] button[data-value]');
+    if (!b) return;
+    const key = b.closest('.seg').dataset.lb;
+    if (key === 'mode') Object.assign(lb, currentBoard(b.dataset.value));   // switch game: jump to its current board
+    else lb[key] = key === 'rounds' ? Number(b.dataset.value) : b.dataset.value;
+    renderLeaders();
   });
   window.addEventListener('online', () => flush());
   document.addEventListener('visibilitychange', () => {
@@ -324,5 +336,5 @@ const Online = (() => {
 
   if (profile) { homeExtras(); flush(); } else showRegister('join');
 
-  return { homeExtras, recordSession, flush };
+  return { homeExtras, recordScore, flush, openLeaders };
 })();

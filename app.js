@@ -158,10 +158,17 @@ const badge = (t, small = false) =>
   `<span class="badge${small ? ' sm' : ''}" style="--c:${t.color}">${t.sym}</span>`;
 
 // -------------------- STATE --------------------
-const settings = Object.assign({ mode: 'arb', difficulty: 'easy', rounds: 5 }, store.get('pitboard-settings', {}));
+const settings = Object.assign(
+  { mode: 'arb', difficulty: 'easy', rounds: 5, digits: 'fwd-easy', switchMode: 'standard', switchSecs: 60, lastGame: 'arb' },
+  store.get('pitboard-settings', {}),
+);
 if (!MODE_LABEL[settings.mode]) settings.mode = 'arb';
 if (!DIFFICULTY[settings.difficulty]) settings.difficulty = 'easy';
 if (![3, 5, 10, 20].includes(settings.rounds)) settings.rounds = 5;
+if (!['fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard'].includes(settings.digits)) settings.digits = 'fwd-easy';
+if (!['standard', 'hard', 'super'].includes(settings.switchMode)) settings.switchMode = 'standard';
+if (![30, 60, 120].includes(settings.switchSecs)) settings.switchSecs = 60;
+if (!['arb', 'mm', 'digits', 'switch'].includes(settings.lastGame)) settings.lastGame = 'arb';
 
 const state = {
   round: 0,
@@ -803,19 +810,22 @@ function endSession() {
       <div class="rb-track"><div class="rb-bar ${r >= 0 ? 'pos' : 'neg'}" style="width:${(Math.abs(r) / maxAbs) * 100}%"></div></div>
       <span class="rb-v ${pnlClass(r)}">${money(r, true)}</span></div>`).join('');
   showScreen('results');
-  if (typeof Online !== 'undefined') Online.recordSession(total);
+  if (typeof Online !== 'undefined') {
+    Online.recordScore({ mode: settings.mode, difficulty: settings.difficulty, rounds: settings.rounds }, total, $('resultsRank'));
+  }
 }
 
 function quitSession() {
   if (!state.roundOver && !confirm('Quit this session? Progress will be lost.')) return;
   stopTimers();
   state.arb = state.mm = null;
-  showScreen('home');
-  renderHome();
+  renderTradeSetup();
+  showScreen('tradeSetup');
 }
 
-// -------------------- HOME --------------------
-function renderHome() {
+// -------------------- TRADE SETUP --------------------
+function renderTradeSetup() {
+  $('tradeTitle').textContent = `${settings.mode === 'arb' ? 'ARBT' : 'MKMK'} · ${MODE_LABEL[settings.mode]}`;
   document.querySelectorAll('.seg[data-setting]').forEach(seg => {
     const key = seg.dataset.setting;
     seg.querySelectorAll('button').forEach(b => {
@@ -828,7 +838,6 @@ function renderHome() {
   $('howtoText').innerHTML = HOWTO[settings.mode];
   const best = store.get(bestKey(), null);
   $('bestLine').textContent = best === null ? 'No sessions at this setting yet' : `Best at this setting: ${money(best, true)}`;
-  if (typeof Online !== 'undefined') Online.homeExtras();
 }
 
 function buildTape() {
@@ -848,7 +857,7 @@ document.querySelectorAll('.seg[data-setting]').forEach(seg => {
     const key = seg.dataset.setting;
     settings[key] = key === 'rounds' ? Number(btn.dataset.value) : btn.dataset.value;
     store.set('pitboard-settings', settings);
-    renderHome();
+    renderTradeSetup();
   });
 });
 $('startBtn').addEventListener('click', startSession);
@@ -862,10 +871,10 @@ $('mmHintBtn').addEventListener('click', mmHint);
 $('mmView').addEventListener('click', onMmControl);
 $('nextBtn').addEventListener('click', nextRound);
 $('againBtn').addEventListener('click', startSession);
-$('menuBtn').addEventListener('click', () => { showScreen('home'); renderHome(); });
+$('menuBtn').addEventListener('click', () => goHome());
 
 buildTape();
-renderHome();
+renderTradeSetup();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pit Board">
-<title>Pit Board — Market Making Trainer</title>
+<title>Pit Board — Trading &amp; Quant Trainer</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="style.css">
@@ -17,62 +17,70 @@
 
 <div id="app">
 
-  <!-- ==================== HOME ==================== -->
+  <!-- ==================== HOME: game watchlist ==================== -->
   <section id="home" class="screen">
     <div class="brand">
       <div>
         <div class="brand-mark">PIT<span>BOARD</span></div>
-        <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+        <div class="brand-sub">Trading &amp; quant interview trainer</div>
       </div>
       <button class="player-chip" id="playerChip" title="Change name"><span class="player-dot"></span><span id="playerName"></span></button>
     </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
 
-    <div class="field">
-      <div class="field-label">Mode</div>
-      <div class="seg seg-2" data-setting="mode">
-        <button data-value="arb"><strong>Arbitrage</strong><small>Spot mispriced quotes &amp; baskets</small></button>
-        <button data-value="mm"><strong>Market Making</strong><small>Quote a bid/ask, manage inventory</small></button>
-      </div>
+    <div class="book">
+      <div class="book-head"><span>Sym</span><span>Game</span><span>Your best</span></div>
+      <div id="gameList"></div>
     </div>
 
-    <div class="field">
-      <div class="field-label">Difficulty</div>
-      <div class="seg seg-4" data-setting="difficulty">
-        <button data-value="easy">Easy</button>
-        <button data-value="medium">Medium</button>
-        <button data-value="hard">Hard</button>
-        <button data-value="expert">Expert</button>
-      </div>
-      <p class="field-help" id="diffDesc"></p>
-    </div>
-
-    <div class="field">
-      <div class="field-label">Rounds</div>
-      <div class="seg seg-4" data-setting="rounds">
-        <button data-value="3">3</button>
-        <button data-value="5">5</button>
-        <button data-value="10">10</button>
-        <button data-value="20">20</button>
-      </div>
-    </div>
-
-    <div class="best-line" id="bestLine"></div>
-    <button class="btn btn-primary btn-start" id="startBtn">Start</button>
-    <button class="btn btn-ghost btn-leaders" id="leadersBtn">🏆 Leaderboard</button>
+    <button class="btn btn-ghost btn-leaders" id="leadersBtn">🏆 Leaderboards</button>
 
     <div class="feed" id="homeFeed" hidden>
       <div class="field-label">Fresh bests</div>
       <ul class="feed-list" id="homeFeedList"></ul>
     </div>
-
-    <details class="howto">
-      <summary>How to play</summary>
-      <div id="howtoText"></div>
-    </details>
   </section>
 
-  <!-- ==================== GAME ==================== -->
+  <!-- ==================== ARBITRAGE / MARKET MAKING SETUP ==================== -->
+  <section id="tradeSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator" id="tradeTitle"></div>
+    </header>
+    <div class="setup-body">
+      <div class="field">
+        <div class="field-label">Difficulty</div>
+        <div class="seg seg-4" data-setting="difficulty">
+          <button data-value="easy">Easy</button>
+          <button data-value="medium">Medium</button>
+          <button data-value="hard">Hard</button>
+          <button data-value="expert">Expert</button>
+        </div>
+        <p class="field-help" id="diffDesc"></p>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Rounds</div>
+        <div class="seg seg-4" data-setting="rounds">
+          <button data-value="3">3</button>
+          <button data-value="5">5</button>
+          <button data-value="10">10</button>
+          <button data-value="20">20</button>
+        </div>
+      </div>
+
+      <div class="best-line" id="bestLine"></div>
+      <button class="btn btn-primary btn-start" id="startBtn">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="tradeLeadersBtn">🏆 Leaderboard</button>
+
+      <details class="howto">
+        <summary>How to play</summary>
+        <div id="howtoText"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ==================== ARBITRAGE / MARKET MAKING PLAY ==================== -->
   <section id="game" class="screen" hidden>
     <header class="topbar">
       <button class="icon-btn" id="quitBtn" aria-label="Quit to menu">✕</button>
@@ -146,12 +154,154 @@
     </div>
   </section>
 
+  <!-- ==================== DIGIT SPAN ==================== -->
+  <section id="digitsSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">DGTS · Digit Span</div>
+    </header>
+    <div class="setup-body">
+      <div class="field">
+        <div class="field-label">Direction</div>
+        <div class="seg seg-2" data-dg="dir">
+          <button data-value="fwd"><strong>Forward</strong><small>See 1 2 3 → type 123</small></button>
+          <button data-value="bwd"><strong>Backward</strong><small>See 1 2 3 → type 321</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Mode</div>
+        <div class="seg seg-2" data-dg="level">
+          <button data-value="easy"><strong>Easy</strong><small>2 tries per length</small></button>
+          <button data-value="hard"><strong>Hard</strong><small>1 try — one miss ends it</small></button>
+        </div>
+      </div>
+      <div class="best-line" id="dgBest"></div>
+      <button class="btn btn-primary btn-start" id="dgStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="dgLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <p>Digits flash one at a time, one per second, starting with 3 digits.</p>
+          <ul>
+            <li><b>Forward:</b> type them in the order shown. <b>Backward:</b> type them reversed.</li>
+            <li>Get it right and the next sequence is one digit longer.</li>
+            <li><b>Easy</b> gives you a second try at each length. On <b>Hard</b> one miss ends the run.</li>
+            <li>Score = the longest sequence you got right. Use the keypad or your keyboard (Enter to submit).</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="digitsPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="dgQuit" aria-label="Quit run">✕</button>
+      <div class="round-indicator" id="dgInfo"></div>
+      <div class="timer" id="dgLen"></div>
+    </header>
+    <div class="dg-body">
+      <div class="dg-meta"><span id="dgTries"></span></div>
+      <div class="dg-screen">
+        <div class="dg-digit" id="dgDigit"></div>
+        <div class="dg-dots" id="dgDots"></div>
+      </div>
+      <div class="dg-status" id="dgStatus"></div>
+      <div class="dg-entry" id="dgEntry"></div>
+      <div class="keypad locked" id="dgPad"></div>
+    </div>
+  </section>
+
+  <!-- ==================== TASK SWITCH ==================== -->
+  <section id="switchSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">SWCH · Task Switch</div>
+    </header>
+    <div class="setup-body">
+      <div class="cue-legend">
+        <div><span class="cue-ico math"></span><span><b>Green circle → MATH.</b> Is the answer odd or even?</span></div>
+        <div><span class="cue-ico arrows"></span><span><b>Red square → ARROWS.</b> Which way do most of them point?</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Mode</div>
+        <div class="seg seg-3" data-sw="mode">
+          <button data-value="standard"><strong>Standard</strong><small>One task at a time</small></button>
+          <button data-value="hard"><strong>Hard</strong><small>Both shown, positions swap</small></button>
+          <button data-value="super"><strong>Super hard</strong><small>Hard + odd/even keys flip</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Clock</div>
+        <div class="seg seg-3" data-sw="secs">
+          <button data-value="30">30s</button>
+          <button data-value="60">60s</button>
+          <button data-value="120">120s</button>
+        </div>
+      </div>
+      <div class="best-line" id="swBest"></div>
+      <button class="btn btn-primary btn-start" id="swStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="swLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <p>A signal flashes in the middle, then the problem appears. Answer with <b>← →</b> on your keyboard or the two buttons.</p>
+          <ul>
+            <li><b>Math:</b> <span class="odd-txt">← ODD</span> · <span class="even-txt">EVEN →</span>. Every number is under 100.</li>
+            <li><b>Arrows:</b> press the direction most arrows point.</li>
+            <li><b>Hard:</b> both problems appear, top and bottom shuffle. Only the one the signal picked counts — remember it.</li>
+            <li><b>Super hard:</b> the odd/even keys sometimes swap sides. The buttons always show the current layout.</li>
+            <li>+1 right, −1 wrong. Taking longer than 4 seconds counts as wrong.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="switchPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="swQuit" aria-label="Quit run">✕</button>
+      <div class="round-indicator" id="swInfo"></div>
+      <div class="timer" id="swTimer">1:00</div>
+    </header>
+    <div class="sw-hud">
+      <span class="score-label">Score <b id="swScore">0</b></span>
+      <span class="sw-streak" id="swStreak"></span>
+    </div>
+    <div class="sw-stage" id="swStage">
+      <div class="sw-slot" id="swTop"></div>
+      <div class="sw-center"><div class="sw-cue" id="swCue"></div><div class="sw-slot" id="swMid"></div></div>
+      <div class="sw-slot" id="swBottom"></div>
+    </div>
+    <div class="sw-map" id="swMap"></div>
+    <div class="sw-keys">
+      <button class="sw-key odd" id="swLeft" aria-label="Left"></button>
+      <button class="sw-key even" id="swRight" aria-label="Right"></button>
+    </div>
+  </section>
+
+  <!-- ==================== SHARED SUMMARY (digits, switch) ==================== -->
+  <section id="summary" class="screen" hidden>
+    <div class="results-card">
+      <div class="field-label" id="summarySub"></div>
+      <h1 id="summaryTitle"></h1>
+      <div class="big-pnl" id="summaryScore"></div>
+      <div class="best-line" id="summaryBest"></div>
+      <div class="rank-line" id="summaryRank"></div>
+      <div id="summaryBody"></div>
+      <button class="btn btn-ghost btn-leaders" id="summaryLeadersBtn">🏆 Leaderboard</button>
+      <div class="controls">
+        <button class="btn btn-ghost" id="summaryMenuBtn">Games</button>
+        <button class="btn btn-primary" id="summaryAgainBtn">Play again</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ==================== REGISTER ==================== -->
   <section id="register" class="screen" hidden>
     <div class="brand">
       <div>
         <div class="brand-mark">PIT<span>BOARD</span></div>
-        <div class="brand-sub">Market making &amp; arbitrage trainer</div>
+        <div class="brand-sub">Trading &amp; quant interview trainer</div>
       </div>
     </div>
     <form class="register-card" id="registerForm" novalidate>
@@ -167,7 +317,7 @@
   <!-- ==================== LEADERBOARD ==================== -->
   <section id="leaders" class="screen" hidden>
     <header class="topbar">
-      <button class="icon-btn" id="leadersBack" aria-label="Back to menu">←</button>
+      <button class="icon-btn" id="leadersBack" aria-label="Back to games">←</button>
       <div class="round-indicator">Leaderboard</div>
     </header>
     <div class="leaders-body">
@@ -175,29 +325,12 @@
         <button data-value="top">Top scores</button>
         <button data-value="feed">Recent bests</button>
       </div>
-      <div class="lb-filters" id="lbFilters">
-        <div class="seg seg-2" data-lb="mode">
-          <button data-value="arb">Arbitrage</button>
-          <button data-value="mm">Market Making</button>
-        </div>
-        <div class="seg seg-4" data-lb="difficulty">
-          <button data-value="easy">Easy</button>
-          <button data-value="medium">Medium</button>
-          <button data-value="hard">Hard</button>
-          <button data-value="expert">Expert</button>
-        </div>
-        <div class="seg seg-4" data-lb="rounds">
-          <button data-value="3">3 rds</button>
-          <button data-value="5">5 rds</button>
-          <button data-value="10">10 rds</button>
-          <button data-value="20">20 rds</button>
-        </div>
-      </div>
+      <div class="lb-filters" id="lbFilters"></div>
       <div id="lbList"></div>
     </div>
   </section>
 
-  <!-- ==================== RESULTS ==================== -->
+  <!-- ==================== ARB / MM RESULTS ==================== -->
   <section id="results" class="screen" hidden>
     <div class="results-card">
       <div class="field-label" id="resultsSub"></div>
@@ -208,7 +341,7 @@
       <div class="round-bars" id="resultsRounds"></div>
       <button class="btn btn-ghost btn-leaders" id="resultsLeadersBtn">🏆 Leaderboard</button>
       <div class="controls">
-        <button class="btn btn-ghost" id="menuBtn">Menu</button>
+        <button class="btn btn-ghost" id="menuBtn">Games</button>
         <button class="btn btn-primary" id="againBtn">Play again</button>
       </div>
     </div>
@@ -218,6 +351,9 @@
 
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script src="games.js"></script>
+<script src="digits.js"></script>
+<script src="switch.js"></script>
 <script src="online.js"></script>
 </body>
 </html>
