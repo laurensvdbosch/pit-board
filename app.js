@@ -172,7 +172,7 @@ if (![30, 60, 120].includes(settings.switchSecs)) settings.switchSecs = 60;
 if (typeof settings.switchFeedback !== 'boolean') settings.switchFeedback = true;
 if (!['easy', 'hard'].includes(settings.confirmLen)) settings.confirmLen = 'easy';
 if (![1, 2, 3].includes(settings.confirmSpeed)) settings.confirmSpeed = 1;
-if (!['arb', 'mm', 'digits', 'switch', 'confirm'].includes(settings.lastGame)) settings.lastGame = 'arb';
+if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series'].includes(settings.lastGame)) settings.lastGame = 'arb';
 
 const state = {
   round: 0,

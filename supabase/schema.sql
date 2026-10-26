@@ -35,11 +35,11 @@ alter table public.best_scores drop constraint if exists best_scores_mode_check;
 alter table public.best_scores drop constraint if exists best_scores_difficulty_check;
 alter table public.best_scores drop constraint if exists best_scores_rounds_check;
 alter table public.best_scores add constraint best_scores_mode_check
-  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm'));
+  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series'));
 alter table public.best_scores add constraint best_scores_difficulty_check
   check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super'));
 alter table public.best_scores add constraint best_scores_rounds_check
-  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 60, 120));
+  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 60, 120, 300));
 create index if not exists best_scores_board on public.best_scores (mode, difficulty, rounds, score desc);
 
 -- One row each time someone beats their own best: the "Recent bests" feed
@@ -150,7 +150,9 @@ begin
     or (p_mode = 'switch' and p_difficulty in ('standard', 'hard', 'super')
           and p_rounds in (30, 60, 120) and v_score = trunc(v_score) and v_score between -10 * p_rounds and 2 * p_rounds)
     or (p_mode = 'confirm' and p_difficulty in ('easy', 'hard')
-          and p_rounds in (1, 2, 3) and v_score = trunc(v_score) and v_score between 0 and 1000),
+          and p_rounds in (1, 2, 3) and v_score = trunc(v_score) and v_score between 0 and 1000)
+    or (p_mode = 'series' and p_difficulty = 'standard'
+          and p_rounds = 300 and v_score = trunc(v_score) and v_score between 0 and 20),
      false) then
     raise exception 'invalid_score';
   end if;

@@ -269,7 +269,7 @@ const Online = (() => {
   // Game picker plus that game's own filters
   function renderFilters() {
     $('lbFilters').innerHTML = `
-      <div class="seg seg-${Object.keys(GAMES).length}" data-lb="mode">${Object.entries(GAMES).map(([id, g]) => `<button data-value="${id}">${g.short}</button>`).join('')}</div>
+      <div class="seg seg-${Object.keys(GAMES).length > 4 ? 3 : Object.keys(GAMES).length}" data-lb="mode">${Object.entries(GAMES).map(([id, g]) => `<button data-value="${id}">${g.short}</button>`).join('')}</div>
       ${GAMES[lb.mode].filters.map(f => `
         <div class="seg seg-${f.options.length}" data-lb="${f.key}">
           ${f.options.map(([v, label]) => `<button data-value="${v}">${label}</button>`).join('')}

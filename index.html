@@ -350,7 +350,63 @@
     </div>
   </section>
 
-  <!-- ==================== SHARED SUMMARY (digits, switch, confirm) ==================== -->
+  <!-- ==================== TAPE AUDIT (sequences) ==================== -->
+  <section id="seriesSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">AUDT · Tape Audit</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">20 number sequences, 5 minutes. Each has one bad print — find it and type it in.
+        You're not expected to finish them all.</p>
+      <div class="sr-examples">
+        <div>
+          <div class="field-label">Extra number</div>
+          <p>One extra number has been inserted into this sequence. Type the number that does not fit.</p>
+          <div class="sr-example">43, 47, 53, <b>57</b>, 59, 61, 67, 71</div>
+          <small>Consecutive primes — 57 (3 × 19) was inserted.</small>
+        </div>
+        <div>
+          <div class="field-label">Wrong number</div>
+          <p>One number in this sequence is wrong. Type the wrong number.</p>
+          <div class="sr-example">7, 18, 29, 40, <b>54</b>, 62, 73, 84</div>
+          <small>Add 11 each step — 54 should be 51.</small>
+        </div>
+      </div>
+      <div class="best-line" id="srBest"></div>
+      <button class="btn btn-primary btn-start" id="srStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="srLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <ul>
+            <li>Questions get harder as you go: 7 easy, 7 medium, 6 hard, drawn from a bank of <b id="srBankSize"></b> checked sequences.</li>
+            <li>Type the number and press <b>Submit</b> (or Enter). <b>Skip</b> sends a question to the back of the line — you'll see it again if time is left.</li>
+            <li>No right/wrong feedback until the end. Score = correct answers; wrong answers cost nothing.</li>
+            <li>Patterns to check, in order: differences, ratios, odd/even positions as two separate sequences, differences of differences, squares/cubes/primes, sums of previous terms, alternating operations.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="seriesPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="srQuit" aria-label="Quit session">✕</button>
+      <div class="round-indicator" id="srInfo"></div>
+      <div class="timer" id="srTimer">5:00</div>
+    </header>
+    <div class="sr-body">
+      <div class="sr-progress" id="srProgress"></div>
+      <p class="sr-prompt" id="srPrompt"></p>
+      <div class="sr-tape" id="srTape"></div>
+      <div class="sr-entry empty" id="srEntry"></div>
+      <div class="keypad" id="srPad"></div>
+      <button class="btn btn-ghost sr-skip" id="srSkip">Skip for now</button>
+    </div>
+  </section>
+
+  <!-- ==================== SHARED SUMMARY (digits, switch, confirm, series) ==================== -->
   <section id="summary" class="screen" hidden>
     <div class="results-card">
       <div class="field-label" id="summarySub"></div>
@@ -426,6 +482,8 @@
 <script src="digits.js"></script>
 <script src="switch.js"></script>
 <script src="confirm.js"></script>
+<script src="series-bank.js"></script>
+<script src="series.js"></script>
 <script src="online.js"></script>
 </body>
 </html>
