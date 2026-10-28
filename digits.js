@@ -10,7 +10,7 @@
 'use strict';
 
 const Digits = (() => {
-  const STEP_MS = 600;    // a new digit lands every 0.6 s
+  const STEP_MS = 500;    // a new digit lands every 0.5 s
   const LEAD_MS = 500;    // pause before the first digit
   const START_LEN = 3;
   const MAX_LEN = 20;
@@ -126,6 +126,11 @@ const Digits = (() => {
     if (k === 'del') g.input = g.input.slice(0, -1);
     else if (/^\d$/.test(k) && g.input.length < g.len) g.input += k;
     renderEntry();
+    // Full code typed: submit on its own after a beat, so the last digit is visible
+    if (g.input.length === g.len) {
+      g.phase = 'submitting';
+      later(150, submit);
+    }
   }
 
   function submit() {
