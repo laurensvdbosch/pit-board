@@ -81,22 +81,26 @@ const Digits = (() => {
     g.phase = 'show';
     $('dgLen').textContent = `LEN ${g.len}`;
     $('dgTries').textContent = g.tries > 1 ? `Try ${g.tries - g.triesLeft + 1} of ${g.tries}` : 'One try';
-    setStatus('Watch the tape…');
-    $('dgDigit').textContent = '';
-    $('dgDots').innerHTML = g.seq.map(() => '<span></span>').join('');
+    setStatus('Watch the code…');
+    const cards = $('dgCards');
+    cards.dataset.size = g.len <= 5 ? 'l' : g.len <= 8 ? 'm' : 's';
+    cards.innerHTML = g.seq.map(() => '<span class="dg-card"></span>').join('');
     $('dgPad').classList.add('locked');
     renderEntry();
 
+    // Digits land in their own card one per second and stay until the code is complete
     let t = LEAD_MS;
     g.seq.forEach((d, i) => {
       later(t, () => {
-        $('dgDigit').textContent = d;
-        $('dgDots').children[i].classList.add('on');
+        const prev = cards.children[i - 1];
+        if (prev) prev.classList.remove('latest');
+        cards.children[i].textContent = d;
+        cards.children[i].classList.add('on', 'latest');
       });
-      later(t + SHOW_MS, () => { $('dgDigit').textContent = ''; });
       t += SHOW_MS + GAP_MS;
     });
     later(t, () => {
+      [...cards.children].forEach(c => { c.textContent = ''; c.className = 'dg-card'; });
       g.phase = 'input';
       $('dgPad').classList.remove('locked');
       setStatus(g.dir === 'fwd' ? 'Type it back in order' : 'Type it back in REVERSE', 'go');
