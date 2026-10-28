@@ -1,5 +1,5 @@
-﻿// Network-first so a new deploy shows up on the next open; cache is the offline fallback.
-const CACHE = 'pitboard-v7';
+// Network-first so a new deploy shows up on the next open; cache is the offline fallback.
+const CACHE = 'pitboard-v8';
 const ASSETS = ['./', 'index.html', 'style.css', 'app.js', 'games.js', 'digits.js', 'switch.js', 'confirm.js', 'series-bank.js', 'series.js', 'online.js', 'config.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

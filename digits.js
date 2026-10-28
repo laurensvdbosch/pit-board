@@ -10,9 +10,8 @@
 'use strict';
 
 const Digits = (() => {
-  const SHOW_MS = 800;    // digit visible
-  const GAP_MS = 200;     // blank between digits (1 digit per second, the standard pace)
-  const LEAD_MS = 700;    // pause before the first digit
+  const STEP_MS = 600;    // a new digit lands every 0.6 s
+  const LEAD_MS = 500;    // pause before the first digit
   const START_LEN = 3;
   const MAX_LEN = 20;
 
@@ -88,7 +87,7 @@ const Digits = (() => {
     $('dgPad').classList.add('locked');
     renderEntry();
 
-    // Digits land in their own card one per second and stay until the code is complete
+    // Digits land in their own card every STEP_MS and stay until the code is complete
     let t = LEAD_MS;
     g.seq.forEach((d, i) => {
       later(t, () => {
@@ -97,7 +96,7 @@ const Digits = (() => {
         cards.children[i].textContent = d;
         cards.children[i].classList.add('on', 'latest');
       });
-      t += SHOW_MS + GAP_MS;
+      t += STEP_MS;
     });
     later(t, () => {
       [...cards.children].forEach(c => { c.textContent = ''; c.className = 'dg-card'; });
