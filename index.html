@@ -357,20 +357,18 @@
       <div class="round-indicator">AUDT · Tape Audit</div>
     </header>
     <div class="setup-body">
-      <p class="field-help">20 number sequences, 5 minutes. Each has one bad print — find it and type it in.
-        You're not expected to finish them all.</p>
+      <p class="field-help">Number logic, trading-firm style: find the next value in each sequence and pick it from 5 options.
+        20 questions, 5 minutes. You're not expected to finish them all.</p>
       <div class="sr-examples">
         <div>
-          <div class="field-label">Extra number</div>
-          <p>One extra number has been inserted into this sequence. Type the number that does not fit.</p>
-          <div class="sr-example">43, 47, 53, <b>57</b>, 59, 61, 67, 71</div>
-          <small>Consecutive primes — 57 (3 × 19) was inserted.</small>
+          <div class="field-label">Example</div>
+          <div class="sr-example">2, 6, 3, 9, 6, 18, ?</div>
+          <small>Alternate ×3, −3 → <b>15</b></small>
         </div>
         <div>
-          <div class="field-label">Wrong number</div>
-          <p>One number in this sequence is wrong. Type the wrong number.</p>
-          <div class="sr-example">7, 18, 29, 40, <b>54</b>, 62, 73, 84</div>
-          <small>Add 11 each step — 54 should be 51.</small>
+          <div class="field-label">Example with fractions</div>
+          <div class="sr-example"><span class="fr"><span>1</span><span>3</span></span>, <span class="fr"><span>2</span><span>5</span></span>, <span class="fr"><span>3</span><span>7</span></span>, <span class="fr"><span>4</span><span>9</span></span>, ?</div>
+          <small>Term n = n/(2n+1) → <b><span class="fr"><span>5</span><span>11</span></span></b></small>
         </div>
       </div>
       <div class="best-line" id="srBest"></div>
@@ -380,10 +378,10 @@
         <summary>How to play</summary>
         <div>
           <ul>
-            <li>Questions get harder as you go: 7 easy, 7 medium, 6 hard, drawn from a bank of <b id="srBankSize"></b> checked sequences.</li>
-            <li>Type the number and press <b>Submit</b> (or Enter). <b>Skip</b> sends a question to the back of the line — you'll see it again if time is left.</li>
-            <li>No right/wrong feedback until the end. Score = correct answers; wrong answers cost nothing.</li>
-            <li>Patterns to check, in order: differences, ratios, odd/even positions as two separate sequences, differences of differences, squares/cubes/primes, sums of previous terms, alternating operations.</li>
+            <li>6 medium questions, then 14 hard ones, drawn from a bank of <b id="srBankSize"></b> checked sequences. Expect fractions, negatives and operation cycles.</li>
+            <li>Tap an option (or press A–E / 1–5). The bottom of the screen flashes green or red. <b>Skip</b> sends a question to the back of the line.</li>
+            <li><b>+1</b> right, <b>−1</b> wrong, 0 skipped — guessing costs you, so skip when unsure.</li>
+            <li>Check in this order: differences, ratios, odd/even positions separately, repeating operation cycles, differences of differences, primes/squares/powers, combinations of the previous two or three terms. For fractions, follow numerators and denominators separately.</li>
           </ul>
         </div>
       </details>
@@ -398,11 +396,12 @@
     </header>
     <div class="sr-body">
       <div class="sr-progress" id="srProgress"></div>
-      <p class="sr-prompt" id="srPrompt"></p>
+      <div class="sr-hud"><span class="sr-prompt">What comes next?</span><span class="score-label">Score <b id="srScore">0</b></span></div>
       <div class="sr-tape" id="srTape"></div>
-      <div class="sr-entry empty" id="srEntry"></div>
-      <div class="keypad" id="srPad"></div>
-      <button class="btn btn-ghost sr-skip" id="srSkip">Skip for now</button>
+      <div class="sr-bottom" id="srBottom">
+        <div class="sr-options" id="srOptions"></div>
+        <button class="btn btn-ghost sr-skip" id="srSkip">Skip for now</button>
+      </div>
     </div>
   </section>
 
