@@ -65,13 +65,34 @@
             <span class="book-name"><b>Tutorial</b><small>Guided hands with a coach</small></span>
             <span class="book-best dim">Soon</span>
           </button>
-          <button class="book-row" disabled>
-            <span class="badge" style="--c:#C58BFF">PUZL</span>
-            <span class="book-name"><b>Puzzles</b><small>Best action · outs &amp; odds · showdown · reads</small></span>
-            <span class="book-best dim">Soon</span>
+        </div>
+      </div>
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Puzzles · earn chips</span><span></span></div>
+        <div id="pokerPuzzleList">
+          <button class="book-row" data-pk="pkodds">
+            <span class="badge" style="--c:#45C4B0">ODDS</span>
+            <span class="book-name"><b>Outs &amp; odds<span class="new-tag" id="new-pkodds" hidden></span></b><small>Count outs, find your price, call or fold</small></span>
+            <span class="book-best">▶</span>
+          </button>
+          <button class="book-row" data-pk="pkshow">
+            <span class="badge" style="--c:#F2A65A">SHOW</span>
+            <span class="book-name"><b>Read the showdown<span class="new-tag" id="new-pkshow" hidden></span></b><small>Who wins? Kickers, splits, board plays</small></span>
+            <span class="book-best">▶</span>
+          </button>
+          <button class="book-row" data-pk="pkspot">
+            <span class="badge" style="--c:#E8A33D">SPOT</span>
+            <span class="book-name"><b>Best action<span class="new-tag" id="new-pkspot" hidden></span></b><small>Open or fold, call or fold the all-in</small></span>
+            <span class="book-best">▶</span>
+          </button>
+          <button class="book-row" data-pk="pkread">
+            <span class="badge" style="--c:#C58BFF">READ</span>
+            <span class="book-name"><b>Read the opponent<span class="new-tag" id="new-pkread" hidden></span></b><small>What does the bot have?</small></span>
+            <span class="book-best">▶</span>
           </button>
         </div>
       </div>
+      <button class="btn btn-ghost btn-leaders" id="pkLeadersBtn">🏆 Poker leaderboards</button>
     </div>
   </section>
 
@@ -513,7 +534,42 @@
     </div>
   </section>
 
-  <!-- ==================== SHARED SUMMARY (digits, switch, confirm, series) ==================== -->
+  <!-- ==================== POKER PUZZLES ==================== -->
+  <section id="pzSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="pzBack" aria-label="Back to poker">←</button>
+      <div class="round-indicator" id="pzTitle"></div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help" id="pzIntro"></p>
+      <div class="howto pz-rules"><ul id="pzRules"></ul></div>
+      <div class="best-line" id="pzBest"></div>
+      <button class="btn btn-primary btn-start" id="pzStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="pzLeaders">🏆 Leaderboard</button>
+    </div>
+  </section>
+
+  <section id="pzPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="pzQuit" aria-label="Quit session">✕</button>
+      <div class="round-indicator" id="pzInfo"></div>
+      <div class="timer" id="pzClock"></div>
+    </header>
+    <div class="pz-body">
+      <div class="sr-hud"><span class="sr-prompt">Score</span><b id="pzScore">0</b></div>
+      <div class="pz-scene" id="pzScene"></div>
+      <p class="pz-prompt" id="pzPrompt"></p>
+      <div class="sr-bottom" id="pzBottom">
+        <div class="pz-options" id="pzOptions"></div>
+        <div class="pz-explain" id="pzExplain" hidden>
+          <div id="pzExplainBody"></div>
+          <button class="btn btn-primary" id="pzNext">Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SHARED SUMMARY (digits, switch, confirm, series, puzzles) ==================== -->
   <section id="summary" class="screen" hidden>
     <div class="results-card">
       <div class="field-label" id="summarySub"></div>
@@ -594,6 +650,8 @@
 <script src="poker-engine.js"></script>
 <script src="poker-bots.js"></script>
 <script src="poker.js"></script>
+<script src="poker-spots.js"></script>
+<script src="poker-puzzles.js"></script>
 <script src="online.js"></script>
 </body>
 </html>

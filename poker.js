@@ -287,7 +287,7 @@ const PokerUI = (() => {
       : 'No bet to you — check for free or bet.';
     const betWord = L.currentBet === 0 ? 'Bet' : 'Raise';
     $('pkActions').innerHTML = `
-      ${L.toCall ? '<button class="btn btn-ghost pk-fold" data-a="fold">Fold</button>' : ''}
+      <button class="btn btn-ghost pk-fold" data-a="fold">Fold</button>
       <button class="btn btn-ghost" data-a="${L.toCall ? 'call' : 'check'}">${L.toCall ? (L.toCall >= mine.stack ? `All-in ${chips(L.toCall)}` : `Call ${chips(L.toCall)}`) : 'Check'}</button>
       ${L.canRaise ? `<button class="btn btn-primary" data-a="open-raise">${betWord}…</button>` : ''}`;
     $('pkRaise').hidden = !T.raiseOpen;
@@ -322,7 +322,13 @@ const PokerUI = (() => {
   // -------------------- INIT --------------------
   $('pokerHubList').addEventListener('click', e => {
     const row = e.target.closest('[data-pk]');
-    if (row && row.dataset.pk === 'play') openLobby();
+    if (!row) return;
+    if (row.dataset.pk === 'play') openLobby();
+    else if (row.dataset.pk.startsWith('pk')) PokerPuzzles.openSetup(row.dataset.pk);
+  });
+  $('pokerPuzzleList').addEventListener('click', e => {
+    const row = e.target.closest('[data-pk]');
+    if (row) PokerPuzzles.openSetup(row.dataset.pk);
   });
   $('pkStakes').addEventListener('click', e => {
     const row = e.target.closest('[data-stake]');
@@ -366,5 +372,12 @@ const PokerUI = (() => {
   save();
   if (!$('pokerSection').hidden) renderHub();
 
-  return { renderHub };
+  // Puzzles pay into the same bankroll
+  function addChips(n) {
+    bank.bankroll += n;
+    save();
+    if (!$('pokerSection').hidden) renderHub();
+  }
+
+  return { renderHub, card, addChips };
 })();

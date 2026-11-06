@@ -35,11 +35,11 @@ alter table public.best_scores drop constraint if exists best_scores_mode_check;
 alter table public.best_scores drop constraint if exists best_scores_difficulty_check;
 alter table public.best_scores drop constraint if exists best_scores_rounds_check;
 alter table public.best_scores add constraint best_scores_mode_check
-  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series'));
+  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'pkodds', 'pkshow', 'pkspot', 'pkread'));
 alter table public.best_scores add constraint best_scores_difficulty_check
   check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super', 'nextval'));
 alter table public.best_scores add constraint best_scores_rounds_check
-  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 60, 120, 300));
+  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 60, 90, 120, 180, 300));
 create index if not exists best_scores_board on public.best_scores (mode, difficulty, rounds, score desc);
 
 -- One row each time someone beats their own best: the "Recent bests" feed
@@ -154,7 +154,13 @@ begin
     or (p_mode = 'series' and p_difficulty = 'standard'
           and p_rounds = 300 and v_score = trunc(v_score) and v_score between 0 and 20)
     or (p_mode = 'series' and p_difficulty = 'nextval'
-          and p_rounds = 300 and v_score = trunc(v_score) and v_score between -20 and 20),
+          and p_rounds = 300 and v_score = trunc(v_score) and v_score between -20 and 20)
+    or (p_mode = 'pkodds' and p_difficulty = 'standard'
+          and p_rounds = 180 and v_score = trunc(v_score) and v_score between -300 and 300)
+    or (p_mode = 'pkshow' and p_difficulty = 'standard'
+          and p_rounds = 90 and v_score = trunc(v_score) and v_score between -200 and 200)
+    or (p_mode in ('pkspot', 'pkread') and p_difficulty = 'standard'
+          and p_rounds = 10 and v_score = trunc(v_score) and v_score between -10 and 10),
      false) then
     raise exception 'invalid_score';
   end if;

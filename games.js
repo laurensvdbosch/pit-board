@@ -7,6 +7,8 @@
    - switch:    difficulty standard | hard | super, rounds = seconds 30/60/120
    - confirm:   difficulty easy | hard (code length), rounds = clock step 1/2/3 (×0.1 s)
    - series:    difficulty nextval (next-value, 5 options, ±1 scoring), rounds = 300 (seconds)
+   - pkodds / pkshow / pkspot / pkread: poker puzzles, difficulty standard,
+     rounds = 180 / 90 seconds or 10 questions (section: 'poker')
                 (difficulty 'standard' was the retired odd-one-out version)
    The server validates the same combinations (supabase/schema.sql).
    Loaded after app.js; digits.js, switch.js and online.js use this.
@@ -62,7 +64,32 @@ const GAMES = {
     filters: [{ key: 'difficulty', options: [['nextval', '20 questions · 5 min']] }],
     fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
   },
+  pkodds: {
+    sym: 'ODDS', short: 'Odds', name: 'Outs & odds', color: '#45C4B0', section: 'poker',
+    blurb: 'Count outs, find your price, call or fold',
+    filters: [{ key: 'difficulty', options: [['standard', '3 min']] }],
+    fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
+  },
+  pkshow: {
+    sym: 'SHOW', short: 'Showdown', name: 'Read the showdown', color: '#F2A65A', section: 'poker',
+    blurb: 'Who wins? Kickers, splits, board plays',
+    filters: [{ key: 'difficulty', options: [['standard', '90 s']] }],
+    fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
+  },
+  pkspot: {
+    sym: 'SPOT', short: 'Action', name: 'Best action', color: '#E8A33D', section: 'poker',
+    blurb: 'Open or fold, call or fold the all-in',
+    filters: [{ key: 'difficulty', options: [['standard', '10 spots']] }],
+    fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
+  },
+  pkread: {
+    sym: 'READ', short: 'Read', name: 'Read the opponent', color: '#C58BFF', section: 'poker',
+    blurb: 'What does the bot have?',
+    filters: [{ key: 'difficulty', options: [['standard', '10 reads']] }],
+    fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
+  },
 };
+const PUZZLE_ROUNDS = { pkodds: 180, pkshow: 90, pkspot: 10, pkread: 10 };
 
 // The board each game is currently set to on this device
 function currentBoard(game) {
@@ -70,6 +97,7 @@ function currentBoard(game) {
   if (game === 'switch') return { mode: 'switch', difficulty: settings.switchMode, rounds: settings.switchSecs };
   if (game === 'confirm') return { mode: 'confirm', difficulty: settings.confirmLen, rounds: settings.confirmSpeed };
   if (game === 'series') return { mode: 'series', difficulty: 'nextval', rounds: 300 };
+  if (PUZZLE_ROUNDS[game]) return { mode: game, difficulty: 'standard', rounds: PUZZLE_ROUNDS[game] };
   return { mode: game, difficulty: settings.difficulty, rounds: settings.rounds };
 }
 
@@ -99,7 +127,7 @@ const saveSettings = () => store.set('pitboard-settings', settings);
 
 // -------------------- LOBBY --------------------
 function renderLobby() {
-  $('gameList').innerHTML = Object.entries(GAMES).map(([id, g]) => {
+  $('gameList').innerHTML = Object.entries(GAMES).filter(([, g]) => g.section !== 'poker').map(([id, g]) => {
     const b = currentBoard(id);
     const best = store.get(boardBestKey(b), null);
     const variant = boardLabel(b).split(' · ').slice(1).join(' · ');
@@ -134,7 +162,9 @@ function goHome() {
 
 function openGame(id) {
   settings.lastGame = id;
-  if (id === 'arb' || id === 'mm') {
+  if (PUZZLE_ROUNDS[id]) {
+    PokerPuzzles.openSetup(id);
+  } else if (id === 'arb' || id === 'mm') {
     settings.mode = id;
     saveSettings();
     renderTradeSetup();
@@ -183,7 +213,8 @@ $('gameList').addEventListener('click', e => {
   if (row) openGame(row.dataset.game);
 });
 document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', goHome));
-$('leadersBtn').addEventListener('click', () => openLeadersFor(currentBoard(settings.lastGame)));
+$('leadersBtn').addEventListener('click', () => openLeadersFor(currentBoard(GAMES[settings.lastGame].section ? 'arb' : settings.lastGame)));
+$('pkLeadersBtn').addEventListener('click', () => openLeadersFor(currentBoard(PUZZLE_ROUNDS[settings.lastGame] ? settings.lastGame : 'pkodds')));
 $('tradeLeadersBtn').addEventListener('click', () => openLeadersFor(currentBoard(settings.mode)));
 $('resultsLeadersBtn').addEventListener('click', () => openLeadersFor(currentBoard(settings.mode)));
 $('summaryLeadersBtn').addEventListener('click', () => openLeadersFor(summaryBoard));

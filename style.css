@@ -1079,3 +1079,52 @@ button{ font: inherit; color: inherit; touch-action: manipulation; cursor: point
   .pc{ width: 34px; height: 48px; }
   .pc.lg{ width: 48px; height: 68px; }
 }
+
+/* -------------------- POKER PUZZLES -------------------- */
+.pz-rules ul{ margin: 0; }
+.pz-body{ display: flex; flex-direction: column; gap: 10px; padding: 10px 0 calc(16px + env(safe-area-inset-bottom)); }
+.pz-scene{
+  display: flex; flex-direction: column; gap: 8px; align-items: stretch;
+  padding: 12px; border-radius: 18px;
+  background: radial-gradient(ellipse at center, #1f5a43 0%, #154733 60%, #0f3326 100%);
+  border: 6px solid #4a3220;
+}
+.pz-board{ display: flex; gap: 4px; justify-content: center; }
+.pz-hand{ display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: rgba(0,0,0,.28); border-radius: 8px; color: #F2E6C9; }
+.pz-hand.me{ box-shadow: inset 3px 0 0 var(--amber); }
+.pz-hand.vil{ box-shadow: inset 3px 0 0 #E06C75; }
+.pz-who{ width: 64px; font-size: 12px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pz-cards{ display: flex; gap: 3px; }
+.pz-note{ font-size: 12px; color: #CFE2D6; margin-left: auto; text-align: right; }
+.pz-pot{ align-self: center; font-family: var(--mono); font-size: 12px; font-weight: 700; color: #F2E6C9; background: rgba(0,0,0,.35); padding: 3px 10px; border-radius: 99px; }
+.pz-seatline{ display: flex; align-items: center; gap: 8px; font-size: 12px; color: #F2E6C9; }
+.pz-line{ list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.pz-line li{ display: flex; gap: 8px; font-size: 13px; color: #F2E6C9; background: rgba(0,0,0,.25); padding: 4px 8px; border-radius: 6px; }
+.pz-line li span{ width: 52px; color: #B8C9BD; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.pz-prompt{ margin: 0; font-size: 15px; font-weight: 700; line-height: 1.4; }
+.pz-options{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pz-options.two{ grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+.pz-opt{
+  min-height: 50px; padding: 10px 8px;
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius);
+  font-weight: 700; font-size: 15px;
+}
+.pz-opt:active{ background: #33373A; }
+.pz-opt.ok{ border-color: var(--gain); background: color-mix(in srgb, var(--gain) 25%, var(--panel)); }
+.pz-opt.bad{ border-color: var(--loss); background: color-mix(in srgb, var(--loss) 25%, var(--panel)); }
+.pz-explain{ display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); font-size: 13px; line-height: 1.5; }
+.pz-explain .btn{ flex: none; padding: 12px 0; }
+.pz-verdict{ font-weight: 800; font-size: 15px; }
+.pz-outs{ display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+.pz-outs .pc{ width: 28px; height: 40px; }
+.pz-outs .pc b, .pz-outs .pc i{ font-size: 12px; }
+.pz-win{ color: var(--gain); font-weight: 700; }
+.pz-bar{ display: grid; grid-template-columns: 1fr 90px 36px; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; }
+.pz-bar i{ display: block; height: 8px; border-radius: 4px; background: var(--chalk-dim); }
+.pz-bar.top i{ background: var(--amber); }
+.pz-bar b{ font-family: var(--mono); text-align: right; }
+.pz-actual{ margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pz-actual .pc{ width: 24px; height: 34px; }
+.pz-actual .pc b, .pz-actual .pc i{ font-size: 11px; }
+.pz-earned{ font-family: var(--mono); font-weight: 700; color: var(--amber); margin: -4px 0 10px; }
+#pzScore{ font-family: var(--mono); font-size: 18px; }
