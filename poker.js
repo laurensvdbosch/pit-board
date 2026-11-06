@@ -144,6 +144,12 @@ const PokerUI = (() => {
   function loop() {
     clearTimeout(T.timer);
     const g = T.game;
+    if (T.script) {   // tutorial: the script decides what happens next
+      render();
+      if (g.over) showResult(false);
+      T.script.tick();
+      return;
+    }
     if (g.over) { handEnd(); return; }
     if (g.toAct === 0) { render(); return; }   // your turn: wait for a button
     const inHand = me().inHand && !me().folded;
@@ -159,6 +165,7 @@ const PokerUI = (() => {
   function humanAct(type, to) {
     const g = T.game;
     if (g.over || g.toAct !== 0) return;
+    if (T.script && !T.script.allow(type)) return;
     T.raiseOpen = false;
     g.act({ type, to });
     render();
@@ -176,7 +183,12 @@ const PokerUI = (() => {
     }
     save();
     render();
-    // One line per distinct set of winners (main + side pots won by the same player are added up)
+    showResult(true);
+  }
+
+  // Who won what — one line per distinct set of winners (main + side pots won by the same player are added up)
+  function showResult(withNext) {
+    const g = T.game, r = g.result, mine = me();
     const groups = [];
     r.pots.forEach((p, k) => {
       const key = p.winners.join();
@@ -193,6 +205,7 @@ const PokerUI = (() => {
     });
     $('pkResultBody').innerHTML = lines.join('') + T.notes.map(n => `<div class="dim">${n}</div>`).join('');
     $('pkResult').hidden = false;
+    $('pkNext').hidden = !withNext;
     $('pkNext').textContent = mine.stack > 0 ? 'Next hand' : 'Continue';
   }
 
@@ -222,6 +235,13 @@ const PokerUI = (() => {
 
   function leave() {
     if (!T) return;
+    if (T.script) {   // leaving a lesson: nothing to cash out
+      clearTimeout(T.timer);
+      const script = T.script;
+      T = null;
+      script.quit();
+      return;
+    }
     const g = T.game;
     if (!g.over && me().inHand && !me().folded && !confirm('Leave now? Chips you already put in this pot are lost.')) return;
     clearTimeout(T.timer);
@@ -285,13 +305,15 @@ const PokerUI = (() => {
     $('pkOdds').innerHTML = L.toCall
       ? `Call <b>${chips(L.toCall)}</b> to win <b>${chips(L.pot)}</b> → you need <b>${Math.round((100 * L.toCall) / (L.pot + L.toCall))}%</b> equity`
       : 'No bet to you — check for free or bet.';
-    const betWord = L.currentBet === 0 ? 'Bet' : 'Raise';
+    const scriptTo = T.script && T.script.raiseTo();
+    const betWord = scriptTo ? `${L.currentBet === 0 ? 'Bet' : 'Raise to'} ${chips(scriptTo)}` : L.currentBet === 0 ? 'Bet…' : 'Raise…';
     $('pkActions').innerHTML = `
       <button class="btn btn-ghost pk-fold" data-a="fold">Fold</button>
       <button class="btn btn-ghost" data-a="${L.toCall ? 'call' : 'check'}">${L.toCall ? (L.toCall >= mine.stack ? `All-in ${chips(L.toCall)}` : `Call ${chips(L.toCall)}`) : 'Check'}</button>
-      ${L.canRaise ? `<button class="btn btn-primary" data-a="open-raise">${betWord}…</button>` : ''}`;
+      ${L.canRaise ? `<button class="btn btn-primary" data-a="open-raise">${betWord}</button>` : ''}`;
     $('pkRaise').hidden = !T.raiseOpen;
     if (T.raiseOpen) renderRaise(L);
+    if (T.script) T.script.decorate($('pkActions'));
   }
 
   function raisePresets(L) {
@@ -324,6 +346,8 @@ const PokerUI = (() => {
     const row = e.target.closest('[data-pk]');
     if (!row) return;
     if (row.dataset.pk === 'play') openLobby();
+    else if (row.dataset.pk === 'tutorial') PokerTutorial.openList();
+    else if (row.dataset.pk === 'basics') PokerTutorial.openBasics();
     else if (row.dataset.pk.startsWith('pk')) PokerPuzzles.openSetup(row.dataset.pk);
   });
   $('pokerPuzzleList').addEventListener('click', e => {
@@ -354,7 +378,12 @@ const PokerUI = (() => {
   $('pkActions').addEventListener('click', e => {
     const b = e.target.closest('button[data-a]');
     if (!b) return;
-    if (b.dataset.a === 'open-raise') { T.raiseOpen = !T.raiseOpen; render(); return; }
+    if (b.dataset.a === 'open-raise') {
+      if (T.script) { humanAct('raise', T.script.raiseTo()); return; }   // lessons bet a set amount
+      T.raiseOpen = !T.raiseOpen;
+      render();
+      return;
+    }
     humanAct(b.dataset.a);
   });
   $('pkPresets').addEventListener('click', e => {
@@ -379,5 +408,35 @@ const PokerUI = (() => {
     if (!$('pokerSection').hidden) renderHub();
   }
 
-  return { renderHub, card, addChips };
+  // -------------------- SCRIPTED SESSIONS (tutorial) --------------------
+  // No bankroll involved; `script` drives bots and decides which buttons work.
+  function startScripted({ lesson, script }) {
+    if (T) clearTimeout(T.timer);
+    const players = lesson.seats.map((name, i) => ({
+      id: `t${i}`, name, human: i === 0, stack: lesson.stack,
+      color: i === 0 ? '#E8A33D' : AVATAR_COLORS[i % AVATAR_COLORS.length], prof: { label: '' },
+    }));
+    T = {
+      stake: { name: lesson.title, sb: lesson.sb, bb: lesson.bb }, players, layout: LAYOUT[players.length],
+      timer: null, raiseOpen: false, notes: [], script,
+      game: new Poker.Game({ players, sb: lesson.sb, bb: lesson.bb, button: lesson.button }),
+    };
+    $('pkTitle').textContent = `🎓 ${lesson.title}`;
+    $('pkResult').hidden = true;
+    showScreen('pokerTable');
+    T.game.startHand();
+    PokerLessons.rig(T.game, lesson, Poker.parseCard);
+    loop();
+  }
+  function scriptAct(action) {
+    if (!T || !T.script || T.game.over) return;
+    T.game.act(action);
+    loop();
+  }
+  function endScripted() {
+    if (T) clearTimeout(T.timer);
+    T = null;
+  }
+
+  return { renderHub, card, addChips, startScripted, scriptAct, endScripted, refreshActions: () => render() };
 })();

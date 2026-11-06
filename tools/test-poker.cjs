@@ -117,5 +117,36 @@ for (const level of ['easy', 'medium', 'hard']) {
   }
 }
 
+// ---------- scripted lessons play out exactly as written ----------
+const { LESSONS, rig } = require('../poker-lessons.js');
+for (const L of LESSONS) {
+  const players = L.seats.map((name, i) => ({ id: i, name, stack: L.stack }));
+  const g = new P.Game({ players, sb: L.sb, bb: L.bb, button: L.button });
+  g.startHand();
+  rig(g, L, P.parseCard);
+  let problem = '';
+  L.steps.forEach((st, k) => {
+    if (problem) return;
+    if (st.bot) {
+      if (g.over || g.toAct === 0) { problem = `step ${k}: expected a bot to act (toAct ${g.toAct}, over ${g.over})`; return; }
+      const L2 = g.legal();
+      if (st.bot.type === 'check' && !L2.canCheck) problem = `step ${k}: bot cannot check`;
+      if (st.bot.type === 'call' && L2.canCheck) problem = `step ${k}: bot has nothing to call`;
+      if (st.bot.type === 'raise' && (st.bot.to < L2.minTo || st.bot.to > L2.maxTo)) problem = `step ${k}: bot raise ${st.bot.to} outside ${L2.minTo}-${L2.maxTo}`;
+      g.act(st.bot);
+    } else if (st.you) {
+      if (g.over || g.toAct !== 0) { problem = `step ${k}: expected you to act (toAct ${g.toAct})`; return; }
+      const L2 = g.legal(), t = st.you[0];
+      if (t === 'check' && !L2.canCheck) problem = `step ${k}: you cannot check`;
+      if (t === 'call' && L2.canCheck) problem = `step ${k}: nothing to call`;
+      if (t === 'raise' && (st.to < L2.minTo || st.to > L2.maxTo)) problem = `step ${k}: raise ${st.to} outside ${L2.minTo}-${L2.maxTo}`;
+      g.act({ type: t, to: st.to });
+    } else if (st.end && !g.over) problem = `step ${k}: hand not over at the end`;
+  });
+  if (!problem && !g.result.pots[0].winners.includes(L.winner)) problem = `expected seat ${L.winner} to win, got ${g.result.pots[0].winners}`;
+  if (!problem && g.board.map(P.cardStr).join(' ') !== L.board.slice(0, g.board.length).join(' ')) problem = `board ${g.board.map(P.cardStr)} vs ${L.board}`;
+  check(`lesson ${L.id} "${L.title}" plays out as scripted`, !problem, problem);
+}
+
 console.log(failures ? `\n${failures} FAILED` : '\nall passed');
 process.exit(failures ? 1 : 0);

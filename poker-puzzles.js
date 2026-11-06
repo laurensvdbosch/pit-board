@@ -48,27 +48,34 @@ const PokerPuzzles = (() => {
   const describe = list => Poker.describe(Poker.evaluate(list));
 
   // -------------------- ODDS: generated live --------------------
+  // Outs (cards that put you ahead next card) and exact equity to the river
+  function analyzeOdds(hero, vil, brd, name) {
+    const used = new Set([...hero, ...vil, ...brd]);
+    const rest = [];
+    for (let c = 0; c < 52; c++) if (!used.has(c)) rest.push(c);
+    const outs = rest.filter(c => Poker.evaluate([...hero, ...brd, c]) > Poker.evaluate([...vil, ...brd, c]));
+    let won = 0, n = 0;
+    const tally = run => { const h = Poker.evaluate([...hero, ...brd, ...run]), v = Poker.evaluate([...vil, ...brd, ...run]); won += h > v ? 1 : h === v ? 0.5 : 0; n++; };
+    const turn = brd.length === 4;
+    if (turn) rest.forEach(c => tally([c]));
+    else for (let i = 0; i < rest.length; i++) for (let j = i + 1; j < rest.length; j++) tally([rest[i], rest[j]]);
+    return { hero, vil, brd, turn, outs, eq: won / n, name };
+  }
+
   function oddsHand() {
     for (let tries = 0; tries < 400; tries++) {
       const d = Poker.shuffledDeck();
       const hero = d.slice(0, 2), vil = d.slice(2, 4);
-      const turn = Math.random() < 0.3;
-      const brd = d.slice(4, turn ? 8 : 7);
-      const rest = d.slice(turn ? 8 : 7);
+      const brd = d.slice(4, Math.random() < 0.3 ? 8 : 7);
       if (Poker.evaluate([...hero, ...brd]) >= Poker.evaluate([...vil, ...brd])) continue;   // you must be behind
-      const outs = rest.filter(c => Poker.evaluate([...hero, ...brd, c]) > Poker.evaluate([...vil, ...brd, c]));
-      if (outs.length < 3 || outs.length > 15) continue;
-      let won = 0, n = 0;
-      const tally = run => { const h = Poker.evaluate([...hero, ...brd, ...run]), v = Poker.evaluate([...vil, ...brd, ...run]); won += h > v ? 1 : h === v ? 0.5 : 0; n++; };
-      if (turn) rest.forEach(c => tally([c]));
-      else for (let i = 0; i < rest.length; i++) for (let j = i + 1; j < rest.length; j++) tally([rest[i], rest[j]]);
-      return { hero, vil, brd, turn, outs, eq: won / n, name: pick(NAMES) };
+      const h = analyzeOdds(hero, vil, brd, pick(NAMES));
+      if (h.outs.length < 3 || h.outs.length > 15) continue;
+      return h;
     }
     return null;
   }
 
-  function oddsQuestions() {
-    const h = oddsHand();
+  function oddsQuestions(h = oddsHand()) {
     const o = h.outs.length;
     const scene = extra => `
       ${boardRow(h.brd)}
@@ -114,6 +121,19 @@ const PokerPuzzles = (() => {
   }
 
   // -------------------- SHOW: generated live --------------------
+  function showFrom(names, hands, brd) {
+    const n = names.length;
+    const scores = hands.map(h => Poker.evaluate([...h, ...brd]));
+    const best = Math.max(...scores);
+    const winners = scores.map((sc, i) => (sc === best ? i : -1)).filter(i => i >= 0);
+    return {
+      scene: `${boardRow(brd)}${names.map((nm, i) => handRow(nm, hands[i])).join('')}`,
+      prompt: 'Who wins this pot?',
+      options: [...names, 'Split pot'], answer: winners.length > 1 ? n : winners[0],
+      explain: names.map((nm, i) => `<div class="${winners.includes(i) ? 'pz-win' : ''}">${nm}: ${Poker.describe(scores[i])}${winners.includes(i) ? (winners.length > 1 ? ' — split' : ' — wins') : ''}</div>`).join(''),
+    };
+  }
+
   function showQuestion() {
     for (let tries = 0; tries < 400; tries++) {
       const n = Math.random() < 0.55 ? 2 : 3;
@@ -127,17 +147,39 @@ const PokerPuzzles = (() => {
       const sorted = [...scores].sort((a, b) => b - a);
       const close = Poker.categoryOf(sorted[0]) === Poker.categoryOf(sorted[1]);
       if (!close && Math.random() < 0.75) continue;
-      const options = [...names, 'Split pot'];
-      const answer = winners.length > 1 ? n : winners[0];
-      return {
-        scene: `${boardRow(brd)}${names.map((nm, i) => handRow(nm, hands[i])).join('')}`,
-        prompt: 'Who wins this pot?',
-        options, answer,
-        explain: names.map((nm, i) => `<div class="${winners.includes(i) ? 'pz-win' : ''}">${nm}: ${Poker.describe(scores[i])}${winners.includes(i) ? (winners.length > 1 ? ' — split' : ' — wins') : ''}</div>`).join(''),
-      };
+      return showFrom(names, hands, brd);
     }
     return null;
   }
+
+  // -------------------- GUIDED EXAMPLES --------------------
+  const P = list => list.map(Poker.parseCard);
+  function examples(m) {
+    if (m === 'pkodds') {
+      const qs = oddsQuestions(analyzeOdds(P(['9h', '8h']), P(['As', 'Ad']), P(['7h', '6c', '2h']), 'Dusty'));
+      const coachTexts = [
+        'Outs are the cards that put you ahead on the very next card. Here: any of the 9 hearts left gives you a flush, and any 5 or 10 gives you a straight. The 5♥ and 10♥ are already counted with the hearts, so add 3 + 3: <b>9 + 6 = 15 outs</b>.',
+        'Rule of 4 on the flop: 15 × 4 = 60%. That\'s a quick estimate — pick the option closest to it. (Very big draws come out a bit lower than the rule says.)',
+        'The price of calling is <b>their bet ÷ (pot + their bet + your call)</b>. Compare it with your chance to win: if your chance is bigger, call.',
+      ];
+      return qs.map((q, i) => ({ ...q, coach: coachTexts[i] }));
+    }
+    if (m === 'pkshow') {
+      const q = showFrom(['Dusty', 'Rosa'], [P(['Ac', '7d']), P(['Qd', 'Jc'])], P(['Ks', 'Kh', '9d', '5c', '2s']));
+      return [{ ...q, coach: 'Both players have a <b>pair of kings</b> — from the board. When the hand type is the same, compare the next-highest cards, the <b>kickers</b>: Dusty\'s ace beats Rosa\'s queen. Only if all five cards tie is it a split.' }];
+    }
+    if (m === 'pkspot') {
+      const open = SPOT_BANK.find(sp => sp.kind === 'open' && sp.answer !== 'Fold');
+      const allin = SPOT_BANK.find(sp => sp.kind === 'allin' && sp.answer !== 'Fold');
+      return [
+        { ...spotQuestion(open), coach: 'Nobody has bet yet. Ask: <b>where am I sitting</b> (more players behind you = play fewer hands) and <b>is my hand good enough for that seat</b>? First in, the choice is raise or fold — just calling is rarely right.' },
+        { ...spotQuestion(allin), coach: 'Facing an all-in, work in three steps: <b>1.</b> the price: bet ÷ (pot + bet + your call). <b>2.</b> the bot\'s style tells you which hands it shoves. <b>3.</b> estimate your chance against those hands and compare with the price.' },
+      ];
+    }
+    const rd = READ_BANK.find(r => Math.max(...r.probs) >= 60) || READ_BANK[0];
+    return [{ ...readQuestion(rd), coach: 'Start with the <b>style</b> on the badge, then read the line: every bet from a tight bot means strength; aggressive and loose bots bet plenty of weak hands too. Checking usually means weak or medium.' }];
+  }
+  const exampleSeen = m => store.get(`pitboard-example-${m}`, false);
 
   // -------------------- SPOT & READ: from the bank --------------------
   function spotQuestion(sp) {
@@ -186,6 +228,7 @@ const PokerPuzzles = (() => {
       + `<li>Every correct answer earns <b>${cfg.chips} chips</b> for your poker bankroll. Wrong answers never cost chips.</li>`;
     const best = store.get(boardBestKey(board(m)), null);
     $('pzBest').textContent = best === null ? 'No sessions yet' : `Your best: ${fmtScore(m, best)}`;
+    $('pzStart').textContent = exampleSeen(m) ? 'Start' : 'Start (with a quick example first)';
     settings.lastGame = m;
     saveSettings();
     showScreen('pzSetup');
@@ -200,12 +243,22 @@ const PokerPuzzles = (() => {
   }
 
   function start() {
+    if (!exampleSeen(mode)) { startExample(); return; }   // first time: walk through an example
     stop();
     const cfg = MODES[mode];
     s = { mode, cfg, queue: [], done: 0, right: 0, wrong: 0, timeLeft: cfg.seconds || 0, paused: false, clock: null, auto: null, busy: false, log: [] };
     if (!cfg.seconds) s.queue = drawFromBank(mode);
     showScreen('pzPlay');
     if (cfg.seconds) s.clock = setInterval(tick, 1000);
+    next();
+  }
+
+  // A guided, unscored walkthrough with coach notes
+  function startExample() {
+    stop();
+    const qs = examples(mode);
+    s = { mode, cfg: { ...MODES[mode], seconds: 0, count: qs.length }, example: true, queue: qs, done: 0, right: 0, wrong: 0, timeLeft: 0, paused: false, clock: null, auto: null, busy: false, log: [] };
+    showScreen('pzPlay');
     next();
   }
 
@@ -224,7 +277,7 @@ const PokerPuzzles = (() => {
 
   function hud() {
     const cfg = s.cfg;
-    $('pzInfo').textContent = `${GAMES[mode].sym} · ${cfg.title}`;
+    $('pzInfo').textContent = s.example ? `${GAMES[mode].sym} · Example` : `${GAMES[mode].sym} · ${cfg.title}`;
     $('pzClock').textContent = cfg.seconds ? clock(s.timeLeft) : `${Math.min(s.done + 1, cfg.count)}/${cfg.count}`;
     $('pzClock').classList.toggle('low', !!cfg.seconds && s.timeLeft <= 10);
     const score = s.right - s.wrong;
@@ -240,6 +293,8 @@ const PokerPuzzles = (() => {
     s.busy = false;
     s.paused = false;
     $('pzScene').innerHTML = s.cur.scene;
+    $('pzCoach').hidden = !s.cur.coach;
+    $('pzCoach').innerHTML = s.cur.coach ? `<b>🎓 How to think about it</b><br>${s.cur.coach}` : '';
     $('pzPrompt').textContent = s.cur.prompt;
     $('pzOptions').innerHTML = s.cur.options.map((o, i) => `<button class="pz-opt" data-i="${i}">${o}</button>`).join('');
     $('pzOptions').classList.toggle('two', s.cur.options.length <= 3);
@@ -263,20 +318,25 @@ const PokerPuzzles = (() => {
     bottom.classList.add(ok ? 'flash-ok' : 'flash-bad');
     hud();
     // Timed modes keep moving after a right answer; anything else stops to explain (clock paused)
-    if (ok && s.cfg.seconds) {
+    if (ok && s.cfg.seconds && !s.example) {
       s.auto = setTimeout(next, 650);
       return;
     }
     s.paused = true;
     $('pzExplainBody').innerHTML = `<div class="pz-verdict ${ok ? 'pos' : 'neg'}">${ok ? '✓ Right' : `✗ ${s.cur.options[s.cur.answer]}`}</div>${s.cur.explain}`;
     $('pzExplain').hidden = false;
-    $('pzNext').textContent = !s.cfg.seconds && s.done >= s.cfg.count ? 'See results' : 'Next';
+    $('pzNext').textContent = !s.cfg.seconds && s.done >= s.cfg.count ? (s.example ? 'Done — now play for real' : 'See results') : 'Next';
   }
 
   function finish() {
     if (!s) return;
     const run = s;
     stop();
+    if (run.example) {   // examples are practice only: no score, no chips
+      store.set(`pitboard-example-${run.mode}`, true);
+      openSetup(run.mode);
+      return;
+    }
     const score = run.right - run.wrong;
     const earned = run.right * run.cfg.chips;
     if (earned) PokerUI.addChips(earned);
@@ -305,7 +365,8 @@ const PokerPuzzles = (() => {
   }
 
   function quit() {
-    if (s && !confirm('Quit this session? Chips are only paid at the end.')) return;
+    if (s && !s.example && !confirm('Quit this session? Chips are only paid at the end.')) return;
+    if (s && s.example) store.set(`pitboard-example-${s.mode}`, true);
     stop();
     openSetup(mode);
   }
@@ -317,6 +378,7 @@ const PokerPuzzles = (() => {
   });
   $('pzNext').addEventListener('click', next);
   $('pzStart').addEventListener('click', start);
+  $('pzExample').addEventListener('click', startExample);
   $('pzQuit').addEventListener('click', quit);
   $('pzLeaders').addEventListener('click', () => openLeadersFor(board(mode)));
   $('pzBack').addEventListener('click', () => goHome());
@@ -326,5 +388,5 @@ const PokerPuzzles = (() => {
     if (/^[1-5]$/.test(e.key) && Number(e.key) <= s.cur.options.length) { choose(Number(e.key) - 1); e.preventDefault(); }
   });
 
-  return { openSetup, MODES, oddsQuestions, showQuestion };
+  return { openSetup, MODES, oddsQuestions, showQuestion, examples };
 })();

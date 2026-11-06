@@ -153,6 +153,7 @@ function renderSection() {
     b.setAttribute('aria-pressed', on);
   });
   if (poker && typeof PokerUI !== 'undefined') PokerUI.renderHub();
+  if (poker && typeof PokerTutorial !== 'undefined') PokerTutorial.maybeWelcome();
 }
 
 function goHome() {
