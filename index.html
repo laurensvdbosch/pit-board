@@ -425,7 +425,7 @@
   <section id="seriesSetup" class="screen" hidden>
     <header class="topbar">
       <button class="icon-btn" data-back aria-label="Back to games">←</button>
-      <div class="round-indicator">AUDT · Tape Audit</div>
+      <div class="round-indicator">SEQS · Sequences</div>
     </header>
     <div class="setup-body">
       <p class="field-help">Number logic, trading-firm style: find the next value in each sequence and pick it from 5 options.
@@ -552,6 +552,62 @@
         <button class="btn btn-primary" id="pkRaiseGo">Raise</button>
       </div>
       <div class="pk-actions" id="pkActions"></div>
+    </div>
+  </section>
+
+  <!-- ==================== MATRICES ==================== -->
+  <section id="mxSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">MTRX · Matrices</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">Abstract reasoning: the figures follow a pattern across rows, down columns, or step by step. Pick the figure that fills the gap from 8 options.</p>
+      <div class="field">
+        <div class="field-label">Mode</div>
+        <div class="seg seg-2" data-mx="mode">
+          <button data-value="test"><strong>Test</strong><small>20 matrices · 10 minutes</small></button>
+          <button data-value="survival"><strong>Survival</strong><small>Harder and harder · 3 lives</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Example — the answer is filled in</div>
+        <div class="mx-example" id="mxExample"></div>
+      </div>
+      <div class="best-line" id="mxBest"></div>
+      <button class="btn btn-primary btn-start" id="mxStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="mxLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <ul>
+            <li><b>Grids:</b> look along the rows and down the columns. Shape, colour, size, number, rotation or position each follow their own rule — often "one of each" per row and column.</li>
+            <li><b>Series:</b> a row of figures that changes step by step. Find what moves, turns, grows or repeats, and continue it.</li>
+            <li><b>Counting:</b> dots or sides add up, subtract, or keep a constant total along each row.</li>
+            <li><b>Overlays:</b> the third figure combines the first two — all lines, only the lines they don't share, only shared lines, or the first minus the second.</li>
+            <li><b>Test:</b> 20 matrices in 10 minutes, easy to hard. Skip and come back if you're stuck.</li>
+            <li><b>Survival:</b> no end — it gets harder every 3 solved. 60 seconds per matrix; 3 misses and you're out.</li>
+            <li>+1 for every correct answer; wrong answers cost nothing, so never leave one blank at the end.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="mxPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="mxQuit" aria-label="Quit run">✕</button>
+      <div class="round-indicator" id="mxInfo"></div>
+      <div class="timer" id="mxTimer"></div>
+    </header>
+    <div class="mx-body">
+      <div class="sr-progress" id="mxProgress"></div>
+      <div class="sr-hud"><span class="sr-prompt" id="mxPrompt"></span><span class="score-label" id="mxStatus"></span></div>
+      <div class="mx-puzzle" id="mxPuzzle"></div>
+      <div class="sr-bottom" id="mxBottom">
+        <div class="mx-options" id="mxOptions"></div>
+        <button class="btn btn-ghost sr-skip" id="mxSkip">Skip for now</button>
+      </div>
     </div>
   </section>
 
@@ -692,6 +748,8 @@
 <script src="confirm.js"></script>
 <script src="series-bank.js"></script>
 <script src="series.js"></script>
+<script src="matrix-gen.js"></script>
+<script src="matrix.js"></script>
 <script src="poker-engine.js"></script>
 <script src="poker-bots.js"></script>
 <script src="poker.js"></script>

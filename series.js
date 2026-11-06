@@ -1,5 +1,5 @@
 /* ===========================================================
-   PIT BOARD — Tape Audit (AUDT): number logic
+   PIT BOARD — Sequences (SEQS): number logic
    ---------------------------------------------------------
    Optiver-style sequences: see the terms, pick the next one from
    5 options. 20 questions on a 5-minute clock, medium first then
@@ -88,7 +88,7 @@ const Series = (() => {
     const [mode, shown, , options] = SERIES_BANK[g.qs[qi].id];
     g.shownAt = performance.now();
     g.busy = false;
-    $('srInfo').textContent = `AUDT · Q${qi + 1} of 20`;
+    $('srInfo').textContent = `SEQS · Q${qi + 1} of 20`;
     $('srTimer').textContent = clock(g.timeLeft);
     $('srTape').innerHTML = shown.map(s => `<span>${num(s, mode)}</span>`).join('') + '<span class="q">?</span>';
     $('srOptions').innerHTML = options.map((o, i) =>
@@ -166,7 +166,7 @@ const Series = (() => {
     showSummary({
       board: board(),
       score,
-      title: run.queue.length ? 'Time called' : 'Tape audited',
+      title: run.queue.length ? 'Time called' : 'Sequences done',
       again: start,
       bodyHtml: `
         <div class="stat-grid">

@@ -7,6 +7,7 @@
    - switch:    difficulty standard | hard | super, rounds = seconds 30/60/120
    - confirm:   difficulty easy | hard (code length), rounds = clock step 1/2/3 (×0.1 s)
    - series:    difficulty nextval (next-value, 5 options, ±1 scoring), rounds = 300 (seconds)
+   - matrix:    difficulty test (20 in 10 min) | survival, rounds 0
    - pkodds / pkshow / pkspot / pkread: poker puzzles, difficulty standard,
      rounds = 180 / 90 seconds or 10 questions (section: 'poker')
                 (difficulty 'standard' was the retired odd-one-out version)
@@ -59,10 +60,16 @@ const GAMES = {
     fmt: s => `${s} match${Number(s) === 1 ? '' : 'es'}`,
   },
   series: {
-    sym: 'AUDT', short: 'Audit', name: 'Tape Audit', color: '#E06C75',
+    sym: 'SEQS', short: 'Seqs', name: 'Sequences', color: '#E06C75',
     blurb: 'Next value in the sequence, 5 options',
     filters: [{ key: 'difficulty', options: [['nextval', '20 questions · 5 min']] }],
     fmt: s => `${Number(s) > 0 ? '+' : ''}${s} pts`,
+  },
+  matrix: {
+    sym: 'MTRX', short: 'Matrices', name: 'Matrices', color: '#8C9BFF',
+    blurb: 'Find the missing figure',
+    filters: [{ key: 'difficulty', options: [['test', '20 in 10 min'], ['survival', 'Survival']] }],
+    fmt: s => `${s} solved`,
   },
   pkodds: {
     sym: 'ODDS', short: 'Odds', name: 'Outs & odds', color: '#45C4B0', section: 'poker',
@@ -97,6 +104,7 @@ function currentBoard(game) {
   if (game === 'switch') return { mode: 'switch', difficulty: settings.switchMode, rounds: settings.switchSecs };
   if (game === 'confirm') return { mode: 'confirm', difficulty: settings.confirmLen, rounds: settings.confirmSpeed };
   if (game === 'series') return { mode: 'series', difficulty: 'nextval', rounds: 300 };
+  if (game === 'matrix') return { mode: 'matrix', difficulty: settings.matrixMode, rounds: 0 };
   if (PUZZLE_ROUNDS[game]) return { mode: game, difficulty: 'standard', rounds: PUZZLE_ROUNDS[game] };
   return { mode: game, difficulty: settings.difficulty, rounds: settings.rounds };
 }
@@ -112,7 +120,7 @@ function boardLabel(b) {
 }
 
 const fmtScore = (mode, s) => (GAMES[mode] ? GAMES[mode].fmt(Number(s)) : String(s));
-const scoreClass = (mode, s) => (['digits', 'confirm'].includes(mode) ? '' : pnlClass(Number(s)));
+const scoreClass = (mode, s) => (['digits', 'confirm', 'matrix'].includes(mode) ? '' : pnlClass(Number(s)));
 const boardBestKey = b => `pitboard-best-${b.mode}-${b.difficulty}-${b.rounds}`;
 
 // Local personal best per board (works offline, mirrors the server)
@@ -172,7 +180,7 @@ function openGame(id) {
     showScreen('tradeSetup');
   } else {
     saveSettings();
-    ({ digits: Digits, switch: Switch, confirm: Confirm, series: Series })[id].openSetup();
+    ({ digits: Digits, switch: Switch, confirm: Confirm, series: Series, matrix: Matrix })[id].openSetup();
   }
 }
 
