@@ -567,7 +567,7 @@
         <div class="field-label">Mode</div>
         <div class="seg seg-2" data-mx="mode">
           <button data-value="test"><strong>Test</strong><small>20 matrices · 10 minutes</small></button>
-          <button data-value="survival"><strong>Survival</strong><small>Harder and harder · 3 lives</small></button>
+          <button data-value="survival"><strong>Survival</strong><small>Harder every 2 solved · 3 lives</small></button>
         </div>
       </div>
       <div class="field">
@@ -581,12 +581,14 @@
         <summary>How to play</summary>
         <div>
           <ul>
-            <li><b>Grids:</b> look along the rows and down the columns. Shape, colour, size, number, rotation or position each follow their own rule — often "one of each" per row and column.</li>
-            <li><b>Series:</b> a row of figures that changes step by step. Find what moves, turns, grows or repeats, and continue it.</li>
-            <li><b>Counting:</b> dots or sides add up, subtract, or keep a constant total along each row.</li>
-            <li><b>Overlays:</b> the third figure combines the first two — all lines, only the lines they don't share, only shared lines, or the first minus the second.</li>
-            <li><b>Test:</b> 20 matrices in 10 minutes, easy to hard. Skip and come back if you're stuck.</li>
-            <li><b>Survival:</b> no end — it gets harder every 3 solved. 60 seconds per matrix; 3 misses and you're out.</li>
+            <li><b>Grids:</b> look along the rows, down the columns <i>and</i> along the diagonals. Shape, colour, size, number, rotation, position and inner parts can each follow their own rule.</li>
+            <li><b>Series</b> (numbered 1, 2, 3 …): find what moves, turns, grows or repeats and continue it. Watch out: sometimes only every other figure (1, 3, 5, 7 …) follows the pattern and the ones in between are decoys.</li>
+            <li><b>Combining:</b> the third figure can take its outer shape from the first and its inner shape from the second.</li>
+            <li><b>Counting:</b> dots or polygon sides add up, subtract, multiply, or keep a constant total.</li>
+            <li><b>Overlays:</b> the third figure merges the first two — all marks, only unshared marks, only shared marks, or the first minus the second. Sometimes you have to work backwards.</li>
+            <li>Nine difficulty levels; harder levels stack several rules at once. No two matrices in a row are the same kind.</li>
+            <li><b>Test:</b> 20 matrices in 10 minutes, level 1 up to 9. Skip and come back if you're stuck.</li>
+            <li><b>Survival:</b> no end — one level harder every 2 solved. 60 seconds per matrix; 3 misses and you're out.</li>
             <li>+1 for every correct answer; wrong answers cost nothing, so never leave one blank at the end.</li>
           </ul>
         </div>
@@ -603,7 +605,7 @@
     <div class="mx-body">
       <div class="sr-progress" id="mxProgress"></div>
       <div class="sr-hud"><span class="sr-prompt" id="mxPrompt"></span><span class="score-label" id="mxStatus"></span></div>
-      <div class="mx-puzzle" id="mxPuzzle"></div>
+      <div class="mx-frame" id="mxPuzzle"></div>
       <div class="sr-bottom" id="mxBottom">
         <div class="mx-options" id="mxOptions"></div>
         <button class="btn btn-ghost sr-skip" id="mxSkip">Skip for now</button>
