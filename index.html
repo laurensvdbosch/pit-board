@@ -28,16 +28,50 @@
     </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
 
-    <div class="book">
-      <div class="book-head"><span>Sym</span><span>Game</span><span>Your best</span></div>
-      <div id="gameList"></div>
+    <div class="seg seg-2 section-switch" id="sectionSwitch">
+      <button data-value="trading">📈 Trading</button>
+      <button data-value="poker">♠️ Poker</button>
     </div>
 
-    <button class="btn btn-ghost btn-leaders" id="leadersBtn">🏆 Leaderboards</button>
+    <div class="home-section" id="tradingSection">
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Game</span><span>Your best</span></div>
+        <div id="gameList"></div>
+      </div>
 
-    <div class="feed" id="homeFeed" hidden>
-      <div class="field-label">Fresh bests</div>
-      <ul class="feed-list" id="homeFeedList"></ul>
+      <button class="btn btn-ghost btn-leaders" id="leadersBtn">🏆 Leaderboards</button>
+
+      <div class="feed" id="homeFeed" hidden>
+        <div class="field-label">Fresh bests</div>
+        <ul class="feed-list" id="homeFeedList"></ul>
+      </div>
+    </div>
+
+    <div class="home-section" id="pokerSection" hidden>
+      <div class="pk-bankcard">
+        <div><span class="field-label">Bankroll</span><div class="pk-bank-val">🪙 <span id="pkBankroll"></span></div></div>
+        <small class="dim" id="pkStats"></small>
+      </div>
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Poker</span><span></span></div>
+        <div id="pokerHubList">
+          <button class="book-row" data-pk="play">
+            <span class="badge" style="--c:#4CAF6E">HOLD</span>
+            <span class="book-name"><b>Play vs bots</b><small>No-Limit Hold'em · 2, 4 or 6 seats</small></span>
+            <span class="book-best">▶</span>
+          </button>
+          <button class="book-row" disabled>
+            <span class="badge" style="--c:#5DB2FF">TUTR</span>
+            <span class="book-name"><b>Tutorial</b><small>Guided hands with a coach</small></span>
+            <span class="book-best dim">Soon</span>
+          </button>
+          <button class="book-row" disabled>
+            <span class="badge" style="--c:#C58BFF">PUZL</span>
+            <span class="book-name"><b>Puzzles</b><small>Best action · outs &amp; odds · showdown · reads</small></span>
+            <span class="book-best dim">Soon</span>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -405,6 +439,80 @@
     </div>
   </section>
 
+  <!-- ==================== POKER: STAKES LOBBY ==================== -->
+  <section id="pokerLobby" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="pkLobbyBack" aria-label="Back to poker">←</button>
+      <div class="round-indicator">HOLD · No-Limit Hold'em</div>
+    </header>
+    <div class="setup-body">
+      <div class="pk-bankcard">
+        <div><span class="field-label">Bankroll</span><div class="pk-bank-val">🪙 <span id="pkLobbyBank"></span></div></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Stakes</div>
+        <div class="book"><div id="pkStakes"></div></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Seats</div>
+        <div class="seg seg-3" id="pkSeats">
+          <button data-value="2">Heads-up</button>
+          <button data-value="4">4 players</button>
+          <button data-value="6">6 players</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-start" id="pkSit">Sit down</button>
+      <button class="btn btn-ghost" id="pkTopUp" hidden>Broke? The house spots you 1,000</button>
+      <details class="howto">
+        <summary>How it works</summary>
+        <div>
+          <ul>
+            <li>You buy in for 100 big blinds (or what's left of your bankroll). Your chips go back to the bankroll when you leave the table.</li>
+            <li>Higher stakes unlock as your bankroll grows: Riverboat at 4,000, High Rollers at 16,000.</li>
+            <li>Each bot's style is shown under its name — tight, loose, aggressive, calls a lot. Adjust to it.</li>
+            <li>When you face a bet you see the <b>pot odds</b>: the share of the final pot you'd be paying, which is how often you need to win for the call to break even.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ==================== POKER: TABLE ==================== -->
+  <section id="pokerTable" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="pkLeave" aria-label="Leave table">←</button>
+      <div class="round-indicator" id="pkTitle"></div>
+      <div class="pk-top-bank" title="Bankroll off the table">🪙 <span id="pkInPlay"></span></div>
+    </header>
+    <div class="pk-felt">
+      <div class="pk-center">
+        <div class="pk-pot" id="pkPot"></div>
+        <div class="pk-board" id="pkBoard"></div>
+      </div>
+      <div id="pkSeatsLayer"></div>
+    </div>
+    <div class="pk-me">
+      <div class="pk-hole" id="pkHole"></div>
+      <div class="pk-me-info">
+        <div class="pk-hand" id="pkHand"></div>
+        <div class="dim">Stack <b id="pkMyStack"></b></div>
+      </div>
+    </div>
+    <div class="pk-controls" id="pkControls">
+      <div class="pk-result" id="pkResult" hidden>
+        <div id="pkResultBody"></div>
+        <button class="btn btn-primary" id="pkNext">Next hand</button>
+      </div>
+      <div class="pk-odds" id="pkOdds"></div>
+      <div class="pk-raise" id="pkRaise" hidden>
+        <div class="pk-presets" id="pkPresets"></div>
+        <input type="range" id="pkSlider" class="pk-slider" aria-label="Raise amount">
+        <button class="btn btn-primary" id="pkRaiseGo">Raise</button>
+      </div>
+      <div class="pk-actions" id="pkActions"></div>
+    </div>
+  </section>
+
   <!-- ==================== SHARED SUMMARY (digits, switch, confirm, series) ==================== -->
   <section id="summary" class="screen" hidden>
     <div class="results-card">
@@ -483,6 +591,9 @@
 <script src="confirm.js"></script>
 <script src="series-bank.js"></script>
 <script src="series.js"></script>
+<script src="poker-engine.js"></script>
+<script src="poker-bots.js"></script>
+<script src="poker.js"></script>
 <script src="online.js"></script>
 </body>
 </html>

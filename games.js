@@ -111,6 +111,20 @@ function renderLobby() {
       </button>`;
   }).join('');
   if (typeof Online !== 'undefined') Online.homeExtras();
+  renderSection();
+}
+
+// Trading games or the poker section, remembered between visits
+function renderSection() {
+  const poker = settings.section === 'poker';
+  $('tradingSection').hidden = poker;
+  $('pokerSection').hidden = !poker;
+  $('sectionSwitch').querySelectorAll('button').forEach(b => {
+    const on = b.dataset.value === settings.section;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  if (poker && typeof PokerUI !== 'undefined') PokerUI.renderHub();
 }
 
 function goHome() {
@@ -157,6 +171,13 @@ function showSummary(opts) {
 }
 
 // -------------------- INIT --------------------
+$('sectionSwitch').addEventListener('click', e => {
+  const b = e.target.closest('button[data-value]');
+  if (!b) return;
+  settings.section = b.dataset.value;
+  saveSettings();
+  renderSection();
+});
 $('gameList').addEventListener('click', e => {
   const row = e.target.closest('[data-game]');
   if (row) openGame(row.dataset.game);
