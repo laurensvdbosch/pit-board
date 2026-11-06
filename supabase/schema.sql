@@ -35,11 +35,11 @@ alter table public.best_scores drop constraint if exists best_scores_mode_check;
 alter table public.best_scores drop constraint if exists best_scores_difficulty_check;
 alter table public.best_scores drop constraint if exists best_scores_rounds_check;
 alter table public.best_scores add constraint best_scores_mode_check
-  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'pkodds', 'pkshow', 'pkspot', 'pkread'));
+  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'));
 alter table public.best_scores add constraint best_scores_difficulty_check
-  check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super', 'nextval', 'test', 'survival'));
+  check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super', 'nextval', 'test', 'survival', 'regular', 'assess', 'quant'));
 alter table public.best_scores add constraint best_scores_rounds_check
-  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 60, 90, 120, 180, 300));
+  check (rounds in (0, 1, 2, 3, 5, 10, 20, 30, 50, 60, 90, 120, 180, 300));
 create index if not exists best_scores_board on public.best_scores (mode, difficulty, rounds, score desc);
 
 -- One row each time someone beats their own best: the "Recent bests" feed
@@ -159,6 +159,12 @@ begin
           and p_rounds = 0 and v_score = trunc(v_score) and v_score between 0 and 20)
     or (p_mode = 'matrix' and p_difficulty = 'survival'
           and p_rounds = 0 and v_score = trunc(v_score) and v_score between 0 and 2000)
+    or (p_mode = 'mdrill' and p_difficulty = 'standard'
+          and p_rounds = 120 and v_score = trunc(v_score) and v_score between 0 and 400)
+    or (p_mode = 'msheet' and p_difficulty in ('regular', 'assess', 'quant')
+          and p_rounds in (10, 20, 50) and v_score = trunc(v_score) and v_score between 0 and p_rounds)
+    or (p_mode = 'mquiz' and p_difficulty in ('easy', 'medium', 'hard', 'quant')
+          and p_rounds = 20 and v_score = trunc(v_score) and v_score between -20 and 20)
     or (p_mode = 'pkodds' and p_difficulty = 'standard'
           and p_rounds = 180 and v_score = trunc(v_score) and v_score between -300 and 300)
     or (p_mode = 'pkshow' and p_difficulty = 'standard'

@@ -28,9 +28,25 @@
     </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
 
-    <div class="seg seg-2 section-switch" id="sectionSwitch">
+    <div class="seg seg-3 section-switch" id="sectionSwitch">
+      <button data-value="math">🧮 Math</button>
       <button data-value="trading">📈 Trading</button>
       <button data-value="poker">♠️ Poker</button>
+    </div>
+
+    <div class="home-section" id="mathSection" hidden>
+      <div>
+        <div class="seg seg-2" id="mathModeSwitch">
+          <button data-value="normal"><strong>Normal</strong><small>Pick your pace and level</small></button>
+          <button data-value="quant"><strong>Quant</strong><small>10 questions a minute</small></button>
+        </div>
+        <p class="field-help math-mode-note" id="mathModeNote"></p>
+      </div>
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Mental math</span><span>Your best</span></div>
+        <div id="mathList"></div>
+      </div>
+      <button class="btn btn-ghost btn-leaders" id="mathLeadersBtn">🏆 Math leaderboards</button>
     </div>
 
     <div class="home-section" id="tradingSection">
@@ -613,6 +629,168 @@
     </div>
   </section>
 
+  <!-- ==================== MENTAL MATH: SPEED DRILL ==================== -->
+  <section id="mdSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">DRIL · Speed drill</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">Answer as many as you can before the clock runs out. Type the answer and the next question appears by itself, no Enter needed.</p>
+      <div class="md-ops" id="mdOps">
+        <div class="md-op">
+          <label><input type="checkbox" data-op="add"> <b>Addition</b></label>
+          <div class="md-range">( <input data-r="addA.0"> to <input data-r="addA.1"> ) + ( <input data-r="addB.0"> to <input data-r="addB.1"> )</div>
+        </div>
+        <div class="md-op">
+          <label><input type="checkbox" data-op="sub"> <b>Subtraction</b></label>
+          <div class="md-range dim">Addition problems in reverse</div>
+        </div>
+        <div class="md-op">
+          <label><input type="checkbox" data-op="mul"> <b>Multiplication</b></label>
+          <div class="md-range">( <input data-r="mulA.0"> to <input data-r="mulA.1"> ) × ( <input data-r="mulB.0"> to <input data-r="mulB.1"> )</div>
+        </div>
+        <div class="md-op">
+          <label><input type="checkbox" data-op="div"> <b>Division</b></label>
+          <div class="md-range dim">Multiplication problems in reverse</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Duration</div>
+        <div class="seg seg-5" id="mdSecs">
+          <button data-value="30">30s</button>
+          <button data-value="60">60s</button>
+          <button data-value="120">120s</button>
+          <button data-value="300">5 min</button>
+          <button data-value="600">10 min</button>
+        </div>
+      </div>
+      <p class="md-ranked" id="mdRanked"></p>
+      <div class="best-line" id="mdBest"></div>
+      <button class="btn btn-primary btn-start" id="mdStart">Start</button>
+      <button class="btn btn-ghost" id="mdReset">Reset to standard settings</button>
+      <button class="btn btn-ghost btn-leaders" id="mdLeaders">🏆 Leaderboard</button>
+    </div>
+  </section>
+
+  <section id="mdPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="mdQuit" aria-label="Quit drill">✕</button>
+      <div class="round-indicator" id="mdInfo"></div>
+      <div class="timer" id="mdTimer"></div>
+    </header>
+    <div class="md-body">
+      <div class="sr-hud"><span class="sr-prompt">Solved</span><b id="mdScore">0</b></div>
+      <div class="md-q" id="mdQ"></div>
+      <input class="md-input" id="mdInput" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" aria-label="Your answer">
+      <p class="md-hint">Just type: it moves on as soon as you're right.</p>
+    </div>
+  </section>
+
+  <!-- ==================== MENTAL MATH: ANSWER SHEET ==================== -->
+  <section id="msSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">SHET · Answer sheet</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">A full test on one page: every question is on screen at once. Scroll, skip around, fill them in, and change any answer until you submit or time runs out.</p>
+      <div class="field">
+        <div class="field-label">Pace</div>
+        <div class="seg seg-2" id="msPace">
+          <button data-value="regular"><strong>Regular</strong><small>24 s per question</small></button>
+          <button data-value="assess"><strong>Assessment</strong><small>12 s per question</small></button>
+          <button data-value="quant"><strong>Quant</strong><small>10 questions a minute, hardest mix</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Questions</div>
+        <div class="seg seg-3" id="msCount">
+          <button data-value="10"><strong>10</strong><small></small></button>
+          <button data-value="20"><strong>20</strong><small></small></button>
+          <button data-value="50"><strong>50</strong><small></small></button>
+        </div>
+      </div>
+      <div class="best-line" id="msBest"></div>
+      <button class="btn btn-primary btn-start" id="msStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="msLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How it works</summary>
+        <div>
+          <ul>
+            <li>Arithmetic, decimals, percentages, fractions, squares and roots, and missing numbers, all in one shuffled list.</li>
+            <li>Type each answer in its box. Use <b>.</b> or <b>,</b> for decimals. Enter jumps to the next box.</li>
+            <li>+1 for every correct answer, nothing off for wrong or blank ones.</li>
+            <li>Submit when you're done; at zero the sheet is handed in for you.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="msPlay" class="screen" hidden>
+    <header class="topbar ms-top">
+      <button class="icon-btn" id="msQuit" aria-label="Quit test">✕</button>
+      <div class="round-indicator" id="msInfo"></div>
+      <div class="timer" id="msTimer"></div>
+    </header>
+    <div class="ms-body">
+      <ol class="ms-list" id="msList"></ol>
+      <button class="btn btn-primary btn-start" id="msSubmit">Submit answers</button>
+    </div>
+  </section>
+
+  <!-- ==================== MENTAL MATH: MULTIPLE CHOICE ==================== -->
+  <section id="mqSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">MCQS · Multiple choice</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">Online-assessment style: 20 questions, 5 options each. Wrong answers cost a point, so skip when you're unsure.</p>
+      <div class="field">
+        <div class="field-label">Difficulty</div>
+        <div class="seg seg-3" id="mqLevel">
+          <button data-value="easy"><strong>Easy</strong><small>5 min</small></button>
+          <button data-value="medium"><strong>Medium</strong><small>8 min</small></button>
+          <button data-value="hard"><strong>Hard</strong><small>10 min</small></button>
+          <button data-value="quant"><strong>Quant</strong><small>20 questions · 2 min, hardest mix</small></button>
+        </div>
+      </div>
+      <div class="best-line" id="mqBest"></div>
+      <button class="btn btn-primary btn-start" id="mqStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="mqLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <div>
+          <ul>
+            <li>Tap an option (or press A–E / 1–5). The bottom of the screen flashes green or red.</li>
+            <li><b>+1</b> right, <b>−1</b> wrong, 0 skipped. <b>Skip</b> sends a question to the back of the line.</li>
+            <li>The wrong options are the classic slips: a missed carry, the decimal point one place off, a neighbouring times-table answer. Don't grab the first number that looks about right.</li>
+            <li>Shortcuts: estimate first, check the last digit, count decimal places, and for "which is the largest?" rewrite powers to the same base (4<sup>7</sup> = 2<sup>14</sup>).</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="mqPlay" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="mqQuit" aria-label="Quit quiz">✕</button>
+      <div class="round-indicator" id="mqInfo"></div>
+      <div class="timer" id="mqTimer"></div>
+    </header>
+    <div class="sr-body">
+      <div class="sr-progress" id="mqProgress"></div>
+      <div class="sr-hud"><span class="sr-prompt" id="mqLevelTag"></span><span class="score-label">Score <b id="mqScore">0</b></span></div>
+      <div class="mq-question" id="mqQuestion"></div>
+      <div class="sr-bottom" id="mqBottom">
+        <div class="sr-options" id="mqOptions"></div>
+        <button class="btn btn-ghost sr-skip" id="mqSkip">Skip for now</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ==================== POKER PUZZLES ==================== -->
   <section id="pzSetup" class="screen" hidden>
     <header class="topbar">
@@ -752,6 +930,8 @@
 <script src="series.js"></script>
 <script src="matrix-gen.js"></script>
 <script src="matrix.js"></script>
+<script src="math-gen.js"></script>
+<script src="math.js"></script>
 <script src="poker-engine.js"></script>
 <script src="poker-bots.js"></script>
 <script src="poker.js"></script>

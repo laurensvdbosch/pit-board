@@ -160,7 +160,8 @@ const badge = (t, small = false) =>
 // -------------------- STATE --------------------
 const settings = Object.assign(
   { mode: 'arb', difficulty: 'easy', rounds: 5, digits: 'fwd-easy', switchMode: 'standard', switchSecs: 60, switchFeedback: true,
-    confirmLen: 'easy', confirmSpeed: 1, matrixMode: 'test', lastGame: 'arb', section: 'trading' },
+    confirmLen: 'easy', confirmSpeed: 1, matrixMode: 'test', lastGame: 'arb', section: 'trading',
+    mathDrill: null, mathMode: 'normal', sheetPace: 'regular', sheetCount: 20, quizLevel: 'medium' },
   store.get('pitboard-settings', {}),
 );
 if (!MODE_LABEL[settings.mode]) settings.mode = 'arb';
@@ -172,9 +173,13 @@ if (![30, 60, 120].includes(settings.switchSecs)) settings.switchSecs = 60;
 if (typeof settings.switchFeedback !== 'boolean') settings.switchFeedback = true;
 if (!['easy', 'hard'].includes(settings.confirmLen)) settings.confirmLen = 'easy';
 if (![1, 2, 3].includes(settings.confirmSpeed)) settings.confirmSpeed = 1;
-if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'pkodds', 'pkshow', 'pkspot', 'pkread'].includes(settings.lastGame)) settings.lastGame = 'arb';
+if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'].includes(settings.lastGame)) settings.lastGame = 'arb';
 if (!['test', 'survival'].includes(settings.matrixMode)) settings.matrixMode = 'test';
-if (!['trading', 'poker'].includes(settings.section)) settings.section = 'trading';
+if (!['math', 'trading', 'poker'].includes(settings.section)) settings.section = 'trading';
+if (!['regular', 'assess'].includes(settings.sheetPace)) settings.sheetPace = 'regular';
+if (![10, 20, 50].includes(settings.sheetCount)) settings.sheetCount = 20;
+if (!['easy', 'medium', 'hard'].includes(settings.quizLevel)) settings.quizLevel = 'medium';
+if (!['normal', 'quant'].includes(settings.mathMode)) settings.mathMode = 'normal';
 
 const state = {
   round: 0,
