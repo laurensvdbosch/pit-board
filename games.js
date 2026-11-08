@@ -8,6 +8,7 @@
    - confirm:   difficulty easy | hard (code length), rounds = clock step 1/2/3 (×0.1 s)
    - series:    difficulty nextval (next-value, 5 options, ±1 scoring), rounds = 300 (seconds)
    - matrix:    difficulty test (20 in 10 min) | survival, rounds 0
+   - conv:      Conviction (Interview format), difficulty gk-easy | gk-hard | fin-easy | fin-hard | fin-quant | mix, rounds 25/50
    - mdrill:    speed drill, difficulty standard, rounds 120 (only standard settings are ranked)
    - msheet:    answer sheet, difficulty regular | assess | quant, rounds = questions 10/20/50
    - mquiz:     multiple choice, difficulty easy | medium | hard | quant, rounds 20   (section: 'math')
@@ -74,6 +75,15 @@ const GAMES = {
     filters: [{ key: 'difficulty', options: [['test', '20 in 10 min'], ['survival', 'Survival']] }],
     fmt: s => `${s} solved`,
   },
+  conv: {
+    sym: 'CNVN', short: 'Conviction', name: 'Conviction', color: '#F07FB0',
+    blurb: 'True or false, then how sure are you?',
+    filters: [
+      { key: 'difficulty', options: [['gk-easy', 'General · Easy'], ['gk-hard', 'General · Hard'], ['fin-easy', 'Finance · Easy'], ['fin-hard', 'Finance · Hard'], ['fin-quant', 'Finance · Quant'], ['mix', 'Mixed']] },
+      { key: 'rounds', options: [[25, '25 Qs'], [50, '50 Qs']] },
+    ],
+    fmt: s => `${Number(s) > 0 ? '+' : Number(s) < 0 ? '−' : ''}${Math.abs(Number(s)).toFixed(2)} pts`,
+  },
   mdrill: {
     sym: 'DRIL', short: 'Drill', name: 'Speed drill', color: '#F2C14E', section: 'math',
     blurb: '+ − × ÷ against the clock, no Enter',
@@ -124,11 +134,16 @@ const PUZZLE_ROUNDS = { pkodds: 180, pkshow: 90, pkspot: 10, pkread: 10 };
 
 // The board each game is currently set to on this device
 function currentBoard(game) {
+  if (GAMES[game] && GAMES[game].board) return GAMES[game].board();   // self-registering games
   if (game === 'digits') return { mode: 'digits', difficulty: settings.digits, rounds: 0 };
   if (game === 'switch') return { mode: 'switch', difficulty: settings.switchMode, rounds: settings.switchSecs };
   if (game === 'confirm') return { mode: 'confirm', difficulty: settings.confirmLen, rounds: settings.confirmSpeed };
   if (game === 'series') return { mode: 'series', difficulty: 'nextval', rounds: 300 };
   if (game === 'matrix') return { mode: 'matrix', difficulty: settings.matrixMode, rounds: 0 };
+  if (game === 'conv') {
+    const d = settings.convCat === 'mix' ? 'mix' : settings.convCat === 'gk' ? (settings.convLevel === 'easy' ? 'gk-easy' : 'gk-hard') : `fin-${settings.convLevel}`;
+    return { mode: 'conv', difficulty: d, rounds: settings.convCount };
+  }
   if (game === 'mdrill') return { mode: 'mdrill', difficulty: 'standard', rounds: 120 };
   const q = settings.mathMode === 'quant';
   if (game === 'msheet') return { mode: 'msheet', difficulty: q ? 'quant' : settings.sheetPace, rounds: settings.sheetCount };
@@ -213,6 +228,7 @@ function goHome() {
 
 function openGame(id) {
   settings.lastGame = id;
+  if (GAMES[id].open) { saveSettings(); GAMES[id].open(); return; }   // self-registering games
   if (PUZZLE_ROUNDS[id]) {
     PokerPuzzles.openSetup(id);
   } else if (id === 'arb' || id === 'mm') {
@@ -225,7 +241,7 @@ function openGame(id) {
     ({ mdrill: MathModes.openDrill, msheet: MathModes.openSheet, mquiz: MathModes.openQuiz })[id]();
   } else {
     saveSettings();
-    ({ digits: Digits, switch: Switch, confirm: Confirm, series: Series, matrix: Matrix })[id].openSetup();
+    ({ digits: Digits, switch: Switch, confirm: Confirm, series: Series, matrix: Matrix, conv: Conviction })[id].openSetup();
   }
 }
 
@@ -235,7 +251,7 @@ const openLeadersFor = board => { if (typeof Online !== 'undefined') Online.open
 let summaryAgain = null;
 let summaryBoard = null;
 
-// opts: { board, score, title, bodyHtml, again, practice?, sub? }
+// opts: { board, score, title, bodyHtml, again, practice?, practiceNote?, sub? }
 // practice runs (custom drill settings) aren't saved as bests or posted
 function showSummary(opts) {
   const practice = Boolean(opts.practice);
@@ -248,7 +264,7 @@ function showSummary(opts) {
   $('summaryScore').textContent = fmtScore(mode, opts.score);
   $('summaryScore').className = 'big-pnl ' + scoreClass(mode, opts.score);
   $('summaryBest').innerHTML = practice
-    ? '<span class="warn">Practice: custom settings aren\'t ranked</span>'
+    ? (opts.practiceNote || '<span class="warn">Practice: custom settings aren\'t ranked</span>')
     : isBest
       ? '<span class="ok">New personal best!</span>'
       : `Your best: ${fmtScore(mode, prev)}`;

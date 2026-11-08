@@ -161,7 +161,7 @@ const badge = (t, small = false) =>
 const settings = Object.assign(
   { mode: 'arb', difficulty: 'easy', rounds: 5, digits: 'fwd-easy', switchMode: 'standard', switchSecs: 60, switchFeedback: true,
     confirmLen: 'easy', confirmSpeed: 1, matrixMode: 'test', lastGame: 'arb', section: 'trading',
-    mathDrill: null, mathMode: 'normal', sheetPace: 'regular', sheetCount: 20, quizLevel: 'medium' },
+    mathDrill: null, convFormat: 'interview', convCat: 'gk', convLevel: 'easy', convCount: 25, mathMode: 'normal', sheetPace: 'regular', sheetCount: 20, quizLevel: 'medium' },
   store.get('pitboard-settings', {}),
 );
 if (!MODE_LABEL[settings.mode]) settings.mode = 'arb';
@@ -173,13 +173,17 @@ if (![30, 60, 120].includes(settings.switchSecs)) settings.switchSecs = 60;
 if (typeof settings.switchFeedback !== 'boolean') settings.switchFeedback = true;
 if (!['easy', 'hard'].includes(settings.confirmLen)) settings.confirmLen = 'easy';
 if (![1, 2, 3].includes(settings.confirmSpeed)) settings.confirmSpeed = 1;
-if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'].includes(settings.lastGame)) settings.lastGame = 'arb';
+if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'conv', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'].includes(settings.lastGame)) settings.lastGame = 'arb';
 if (!['test', 'survival'].includes(settings.matrixMode)) settings.matrixMode = 'test';
 if (!['math', 'trading', 'poker'].includes(settings.section)) settings.section = 'trading';
 if (!['regular', 'assess'].includes(settings.sheetPace)) settings.sheetPace = 'regular';
 if (![10, 20, 50].includes(settings.sheetCount)) settings.sheetCount = 20;
 if (!['easy', 'medium', 'hard'].includes(settings.quizLevel)) settings.quizLevel = 'medium';
 if (!['normal', 'quant'].includes(settings.mathMode)) settings.mathMode = 'normal';
+if (!['interview', 'scroll'].includes(settings.convFormat)) settings.convFormat = 'interview';
+if (!['gk', 'fin', 'mix'].includes(settings.convCat)) settings.convCat = 'gk';
+if (!['easy', 'hard', 'quant'].includes(settings.convLevel)) settings.convLevel = 'easy';
+if (![25, 50].includes(settings.convCount)) settings.convCount = 25;
 
 const state = {
   round: 0,

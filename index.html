@@ -791,6 +791,76 @@
     </div>
   </section>
 
+  <!-- ==================== CONVICTION ==================== -->
+  <section id="cvSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">CNVN · Conviction</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">True or false, more or less. Pick your answer, then slide from 50% to 100% to show how sure you are. Read carefully: being sure and wrong costs far more than being unsure.</p>
+      <div class="field">
+        <div class="field-label">Format</div>
+        <div class="seg seg-2" id="cvFormat">
+          <button data-value="interview"><strong>Interview</strong><small>One at a time · 30 s each</small></button>
+          <button data-value="scroll"><strong>Untimed</strong><small>One scrollable page</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Category</div>
+        <div class="seg seg-3" id="cvCat">
+          <button data-value="gk">General</button>
+          <button data-value="fin">Finance</button>
+          <button data-value="mix">Mixed</button>
+        </div>
+      </div>
+      <div class="field" id="cvLevelField">
+        <div class="field-label">Difficulty</div>
+        <div class="seg seg-3" id="cvLevel">
+          <button data-value="easy">Easy</button>
+          <button data-value="hard">Hard</button>
+          <button data-value="quant" id="cvLevelQuant">Quant</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Questions</div>
+        <div class="seg seg-2 cv-count" id="cvCount">
+          <button data-value="25">25</button>
+          <button data-value="50">50</button>
+        </div>
+      </div>
+      <p class="md-ranked dim" id="cvNote"></p>
+      <div class="best-line" id="cvBest"></div>
+      <button class="btn btn-primary btn-start" id="cvStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="cvLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How scoring works</summary>
+        <div>
+          <ul>
+            <li>50% scores 0, right or wrong. Use it when you're guessing.</li>
+            <li>The surer you are, the more you win if right and the more you lose if wrong: at 80% it's +0.84 or −1.56; at 100% it's +1 or −3.</li>
+            <li>Your best play is always to set the slider to what you really believe.</li>
+            <li>Right and wrong are only revealed at the end. Some statements look almost identical, so read every word.</li>
+            <li><b>Interview:</b> when the 30 seconds run out, your current answer is locked in. No answer stays blank and scores 0. You can't go back.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="cvPlay" class="screen" hidden>
+    <header class="topbar ms-top">
+      <button class="icon-btn" id="cvQuit" aria-label="Quit round">✕</button>
+      <div class="round-indicator" id="cvInfo"></div>
+      <div class="timer" id="cvTimer"></div>
+    </header>
+    <div class="ms-body">
+      <ol class="cv-list" id="cvList"></ol>
+      <button class="btn btn-primary btn-start" id="cvNext">Next</button>
+      <button class="btn btn-primary btn-start" id="cvSubmit">Hand in</button>
+    </div>
+  </section>
+
   <!-- ==================== POKER PUZZLES ==================== -->
   <section id="pzSetup" class="screen" hidden>
     <header class="topbar">
@@ -923,6 +993,7 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script src="games.js"></script>
+<script src="dataroom.js"></script>
 <script src="digits.js"></script>
 <script src="switch.js"></script>
 <script src="confirm.js"></script>
@@ -930,6 +1001,8 @@
 <script src="series.js"></script>
 <script src="matrix-gen.js"></script>
 <script src="matrix.js"></script>
+<script src="conviction-bank.js"></script>
+<script src="conviction.js"></script>
 <script src="math-gen.js"></script>
 <script src="math.js"></script>
 <script src="poker-engine.js"></script>
