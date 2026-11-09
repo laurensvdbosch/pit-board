@@ -180,6 +180,7 @@ const saveSettings = () => store.set('pitboard-settings', settings);
 function renderLobby() {
   $('gameList').innerHTML = lobbyRows(undefined);
   $('mathList').innerHTML = lobbyRows('math');
+  $('oddsList').innerHTML = lobbyRows('odds');
   if (typeof Online !== 'undefined') Online.homeExtras();
   renderSection();
 }
@@ -198,7 +199,7 @@ function lobbyRows(section) {
   }).join('');
 }
 
-// Math, trading or poker, remembered between visits
+// Math, trading, odds or poker, remembered between visits
 function renderSection() {
   const poker = settings.section === 'poker';
   $('mathSection').hidden = settings.section !== 'math';
@@ -211,6 +212,7 @@ function renderSection() {
     ? 'Like Optiver\'s 80 in 8 and Maven\'s 50 in 5. The hardest mix, for the answer sheet and multiple choice. The speed drill stays the same.'
     : 'Choose your own pace and difficulty.';
   $('tradingSection').hidden = settings.section !== 'trading';
+  $('oddsSection').hidden = settings.section !== 'odds';
   $('pokerSection').hidden = !poker;
   $('sectionSwitch').querySelectorAll('button').forEach(b => {
     const on = b.dataset.value === settings.section;
@@ -289,7 +291,7 @@ $('mathModeSwitch').addEventListener('click', e => {
   saveSettings();
   renderLobby();
 });
-['gameList', 'mathList'].forEach(list => $(list).addEventListener('click', e => {
+['gameList', 'mathList', 'oddsList'].forEach(list => $(list).addEventListener('click', e => {
   const row = e.target.closest('[data-game]');
   if (row) openGame(row.dataset.game);
 }));

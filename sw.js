@@ -1,6 +1,6 @@
 // Network-first so a new deploy shows up on the next open; cache is the offline fallback.
-const CACHE = 'pitboard-v18';
-const ASSETS = ['./', 'index.html', 'style.css', 'app.js', 'games.js', 'digits.js', 'switch.js', 'confirm.js', 'series-bank.js', 'series.js', 'matrix-gen.js', 'matrix.js', 'conviction-bank.js', 'conviction.js', 'math-gen.js', 'math.js', 'poker-engine.js', 'poker-bots.js', 'poker.js', 'poker-spots.js', 'poker-puzzles.js', 'poker-lessons.js', 'poker-tutorial.js', 'online.js', 'config.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'pitboard-v19';
+const ASSETS = ['./', 'index.html', 'style.css', 'app.js', 'games.js', 'digits.js', 'switch.js', 'confirm.js', 'series-bank.js', 'series.js', 'matrix-gen.js', 'matrix.js', 'prob-bank.js', 'odds-engine.js', 'odds.js', 'conviction-bank.js', 'conviction.js', 'math-gen.js', 'math.js', 'poker-engine.js', 'poker-bots.js', 'poker.js', 'poker-spots.js', 'poker-puzzles.js', 'poker-lessons.js', 'poker-tutorial.js', 'online.js', 'config.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));

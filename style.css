@@ -1324,3 +1324,79 @@ sup{ font-size: .6em; line-height: 0; }
 .cv-pct{ font-family: var(--mono); font-size: 16px; text-align: right; }
 .cv-review-q{ font-size: 14px; font-weight: 600; margin: 4px 0; line-height: 1.35; }
 #cvNext:disabled{ opacity: .4; }
+
+/* ==================== ODDS ==================== */
+.section-switch.seg-4 button{ padding: 11px 1px; font-size: 13px; white-space: nowrap; }
+.od-options{ display: flex; flex-direction: column; gap: 18px; }
+.od-options:empty{ display: none; }
+.od-center button{ text-align: center; }
+.od-options .seg-3 button{ text-align: center; }
+.od-body{ display: flex; flex-direction: column; gap: 12px; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); }
+.od-body .sr-hud b{ font-family: var(--mono); font-size: 18px; margin-left: 4px; }
+
+.od-paper-q{ margin: 6px 0 0; font-size: 18px; font-weight: 600; line-height: 1.4; }
+.od-paper-sub{ margin: 0; font-size: 13px; color: var(--chalk-dim); }
+.od-paper-opts{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.od-paper-opt{ padding: 18px 4px; font-family: var(--mono); font-size: 17px; font-weight: 700; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-paper-opt:active{ background: #33373A; }
+.od-paper-opt.skip{ font-family: var(--sans); font-size: 15px; color: var(--chalk-dim); background: transparent; }
+
+.od-streak{ min-height: 16px; font-size: 12px; font-weight: 700; color: var(--amber); text-align: center; }
+.od-take-area{ touch-action: pan-y; }
+.od-bet{ display: flex; flex-direction: column; justify-content: center; gap: 10px; min-height: 190px; padding: 18px 14px; text-align: center; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-bet-price{ font-family: var(--mono); font-size: 34px; font-weight: 700; color: var(--amber); }
+.od-bet-desc{ font-size: 18px; font-weight: 600; line-height: 1.35; }
+.od-take-btns{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.od-pass, .od-takebtn{ padding: 20px 0; font-size: 18px; font-weight: 800; border-radius: var(--radius); }
+.od-pass{ background: var(--panel); border: 1px solid var(--panel-border); }
+.od-takebtn{ background: var(--amber); border: 1px solid var(--amber); color: var(--board); }
+.od-last{ margin: 0; min-height: 36px; text-align: center; font-size: 13px; line-height: 1.4; color: #CFCCC5; }
+.od-last b{ font-family: var(--mono); }
+
+.od-panel{ display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-rule{ font-size: 14px; line-height: 1.4; }
+.od-faces{ display: flex; flex-wrap: wrap; gap: 5px; }
+.od-faces span{ width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 14px; font-weight: 700; background: var(--board); border: 1px solid var(--panel-border); border-radius: 5px; }
+.od-faces span.bust{ color: #F08A7B; border-color: var(--loss); text-decoration: line-through; }
+.od-faces span.hit{ color: var(--board); background: var(--amber); border-color: var(--amber); text-decoration: none; }
+.od-faces span.bust.hit{ color: #fff; background: var(--loss); border-color: var(--loss); }
+.od-pot{ text-align: center; }
+.od-pot .field-label{ margin: 0; }
+.od-pot-val{ font-family: var(--mono); font-size: 52px; font-weight: 700; color: var(--amber); }
+.od-result{ padding: 10px 12px; font-size: 14px; line-height: 1.45; background: var(--panel); border-radius: var(--radius); }
+.od-result b{ font-family: var(--mono); font-size: 16px; margin-right: 4px; }
+
+.od-card-row{ display: flex; align-items: center; justify-content: center; gap: 18px; padding: 6px 0; }
+.od-card{ width: 78px; height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: var(--mono); font-size: 32px; font-weight: 700; color: #1B1D1F; background: var(--chalk); border-radius: 8px; }
+.od-card.red{ color: #C0392B; }
+.od-card-meta{ font-size: 14px; line-height: 1.5; }
+.od-card-meta b{ font-family: var(--mono); font-size: 20px; }
+.od-card-meta small{ color: var(--chalk-dim); }
+.od-tracker{ display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; }
+.od-tracker span{ display: flex; flex-direction: column; align-items: center; padding: 3px 0; font-family: var(--mono); font-size: 12px; color: var(--amber); background: var(--panel); border-radius: 3px; }
+.od-tracker span b{ font-size: 10px; color: var(--chalk-dim); }
+.od-tracker span.none{ opacity: .35; }
+.od-bet-row{ display: grid; grid-template-columns: 64px repeat(3, 1fr); gap: 6px; align-items: center; }
+.od-bet-row > span{ font-size: 15px; font-weight: 800; }
+.od-size{ padding: 15px 0; font-family: var(--mono); font-size: 15px; font-weight: 700; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-size:active{ background: #33373A; }
+#nxArea .btn{ flex: none; padding: 11px 0; }
+
+.od-urns{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.od-urn{ padding: 10px; text-align: center; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-balls{ display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; margin-top: 6px; }
+.od-balls i{ width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-style: normal; font-family: var(--mono); font-size: 11px; font-weight: 700; color: #fff; border-radius: 50%; }
+.od-balls i.r{ background: #D95F0E; }
+.od-balls i.b{ background: #3987E5; }
+.od-drawn{ min-height: 58px; text-align: center; }
+.od-drawn .field-label{ margin: 0; }
+.od-body .sr-bottom .btn{ flex: none; padding: 13px 0; }
+.od-body .btn:disabled{ opacity: .4; }
+
+.od-lives{ font-size: 18px; color: var(--loss); letter-spacing: 2px; }
+.od-like{ gap: 10px; }
+.od-like-opt{ display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 128px; padding: 14px; font-size: 19px; font-weight: 700; line-height: 1.3; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.od-like-opt small{ min-height: 18px; font-family: var(--mono); font-size: 15px; color: var(--chalk-dim); }
+.od-like-opt.best{ border-color: var(--gain); }
+.od-like-opt.best small{ color: var(--gain); }
+.od-like-opt.other{ opacity: .65; }
