@@ -178,23 +178,55 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
       .sort((a, b) => a.d - b.d || Object.keys(CAT).indexOf(a.c) - Object.keys(CAT).indexOf(b.c));
   }
 
+  // Desktop: the open puzzle sits in a pane beside the list instead of its own screen
+  const wide = window.matchMedia('(min-width: 900px)');
+  function placeView() {
+    const body = $('btViewBody');
+    if (wide.matches) { if (body.parentNode !== $('btPaneSlot')) $('btPaneSlot').appendChild(body); }
+    else if (body.parentNode !== $('btView')) $('btView').appendChild(body);
+  }
+  placeView();
+  wide.addEventListener('change', () => {
+    placeView();
+    if (wide.matches && !$('btView').hidden) { renderLibrary(); showScreen('btLib'); }
+  });
+
   function openLibrary() {
     renderLibrary();
     showScreen('btLib');
+    if (wide.matches) {
+      if (view) showPuzzle();
+      else {
+        const list = libraryList();
+        const first = list.find(p => !prog[p.id]) || list[0];
+        if (first) openPuzzle(first.id);
+      }
+    }
   }
 
   function renderLibrary() {
-    $('btLibCount').textContent = `${solvedCount()}/${BANK.length} solved`;
     $('btLibFilters').innerHTML = `
       ${field('Level', multi('libD', DIFF_LIST, opts.libD))}
       ${field('Topic', multi('libC', Object.entries(CAT), opts.libC, 'seg-2'))}
       ${field('Type', single('libK', KIND_LIST, opts.libK))}
       <label class="bt-toggle"><input type="checkbox" id="btOpenOnly" ${opts.libOpen ? 'checked' : ''}> Hide puzzles I've solved</label>`;
+    renderList();
+  }
+
+  function renderList() {
+    $('btLibCount').textContent = `${solvedCount()}/${BANK.length} solved`;
     const list = libraryList();
+    const cur = view ? view.list[view.i] : null;
+    if (view) {   // prev / next follow the filtered list
+      const ids = list.map(p => p.id);
+      if (!ids.includes(cur)) ids.unshift(cur);
+      Object.assign(view, { list: ids, i: ids.indexOf(cur) });
+      $('btViewPos').textContent = $('btPanePos').textContent = `${view.i + 1} / ${ids.length}`;
+    }
     $('btLibList').innerHTML = list.length ? list.map(p => {
       const st = prog[p.id];
       return `
-        <button class="bt-item" data-id="${p.id}">
+        <button class="bt-item${p.id === cur ? ' cur' : ''}" data-id="${p.id}" ${p.id === cur ? 'aria-current="true"' : ''}>
           <span class="bt-item-main"><b>${esc(p.t)}</b><small><span class="bt-dtext bt-d${p.d}">${DIFF[p.d]}</span> · ${CAT[p.c]} · ${KIND[p.k]}</small></span>
           <span class="bt-mark ${st || ''}">${st === 'solved' ? '✓' : st === 'missed' ? '✗' : ''}</span>
         </button>`;
@@ -206,7 +238,7 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
     if (!list.includes(id)) list.unshift(id);
     view = { list, i: list.indexOf(id) };
     showPuzzle();
-    showScreen('btView');
+    if (wide.matches) renderList(); else showScreen('btView');
   }
 
   function showPuzzle() {
@@ -214,6 +246,8 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
     Object.assign(view, { hint: false, done: false, tries: 0 });
     $('btViewTitle').textContent = p.t;
     $('btViewPos').textContent = `${view.i + 1} / ${view.list.length}`;
+    $('btPaneTitle').textContent = p.t;
+    $('btPanePos').textContent = `${view.i + 1} / ${view.list.length}`;
     let answer;
     if (p.a.n !== undefined) {
       answer = `
@@ -242,13 +276,14 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
         <button class="btn btn-ghost" id="btPrev" ${view.i === 0 ? 'disabled' : ''}>← Previous</button>
         <button class="btn btn-ghost" id="btNext" ${view.i >= view.list.length - 1 ? 'disabled' : ''}>Next →</button>
       </div>`;
-    window.scrollTo(0, 0);
+    if (wide.matches) $('btPane').scrollTop = 0; else window.scrollTo(0, 0);
   }
 
   function mark(p, st) {
     if (prog[p.id] === 'solved' && st === 'missed') return;   // a past solve stands
     prog[p.id] = st;
     saveProg();
+    if (wide.matches) renderList();
   }
 
   function reveal(p, selfMark) {
@@ -260,7 +295,8 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
         <button class="btn btn-ghost bt-yes" data-self="solved">✓ I had it</button>
         <button class="btn btn-ghost bt-no" data-self="missed">✗ Not quite</button>
       </div>` : '');
-    $('btSol').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (wide.matches) $('btPane').scrollTo({ top: $('btSol').offsetTop - 70, behavior: 'smooth' });
+    else $('btSol').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function libCheck() {
@@ -543,8 +579,25 @@ const Puzzles = typeof document === 'undefined' ? null : (() => {
     } else if (t.dataset.self) {
       mark(p, t.dataset.self);
       $('btSelf').innerHTML = t.dataset.self === 'solved' ? '<span class="ok">✓ Marked as solved</span>' : '<span class="dim">Marked as not yet. It stays in your unsolved list.</span>';
-    } else if (t.id === 'btPrev' && view.i > 0) { view.i -= 1; showPuzzle(); }
-    else if (t.id === 'btNext' && view.i < view.list.length - 1) { view.i += 1; showPuzzle(); }
+    } else if (t.id === 'btPrev' && view.i > 0) { view.i -= 1; showPuzzle(); if (wide.matches) renderList(); }
+    else if (t.id === 'btNext' && view.i < view.list.length - 1) { view.i += 1; showPuzzle(); if (wide.matches) renderList(); }
+  });
+
+  // Keyboard: 1–4 or A–D pick a choice; ← → move through the library
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+    const inRound = run && !$('btPlay').hidden;
+    const inLib = view && (!$('btView').hidden || (wide.matches && !$('btLib').hidden));
+    if (!inRound && !inLib) return;
+    if (inLib && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const b = $(e.key === 'ArrowLeft' ? 'btPrev' : 'btNext');
+      if (b && !b.disabled) { b.click(); e.preventDefault(); }
+      return;
+    }
+    const n = /^[1-9]$/.test(e.key) ? Number(e.key) - 1 : e.key.length === 1 ? 'abcd'.indexOf(e.key.toLowerCase()) : -1;
+    if (n < 0) return;
+    const b = document.querySelector(inRound ? `#btPlayBody [data-ropt="${n}"]` : `#btViewBody [data-opt="${n}"]`);
+    if (b && !b.disabled) { b.click(); e.preventDefault(); }
   });
 
   $('btSetupFilters').addEventListener('click', e => filterClick(e, renderSetup));

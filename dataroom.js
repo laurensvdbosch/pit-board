@@ -535,6 +535,30 @@ if (typeof document !== 'undefined') (() => {
     .dr-keys button.wide{ grid-column: span 2; }
     .dr-review summary{ cursor: pointer; font-size: 12px; font-weight: 700; color: var(--chalk-dim); margin-top: 4px; }
     .dr-review .dr-exhibit{ margin-top: 6px; background: var(--board); }
+    .dr-keyhint{ display: none; }
+    /* Desktop: exhibit on the left (stays put), question and calculator on the right */
+    @media (min-width: 900px){
+      body[data-screen="drPlay"] #app{ max-width: 1240px; }
+      .dr-body{
+        display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(340px, 1fr);
+        grid-template-areas: "strip strip" "ex q" "ex opts" "ex nav" "ex sub" "ex hint" "ex calc";
+        grid-template-rows: auto auto auto auto auto auto 1fr; column-gap: 28px; row-gap: 10px; align-items: start;
+      }
+      .dr-body.calc-open{ padding-bottom: 16px; }
+      .dr-strip{ grid-area: strip; grid-template-columns: repeat(20, 1fr); }
+      .dr-exhibit{ grid-area: ex; position: sticky; top: 76px; max-height: calc(100dvh - 96px); overflow: auto; padding: 14px; }
+      .dr-q{ grid-area: q; font-size: 18px; margin-top: 4px; }
+      #drOptions{ grid-area: opts; }
+      .dr-nav{ grid-area: nav; }
+      #drSubmit{ grid-area: sub; }
+      .dr-keyhint{ display: block; grid-area: hint; margin: 0; font-size: 12px; color: var(--chalk-dim); }
+      .dr-keyhint b{ color: #CFCCC5; font-family: var(--mono); }
+      .dr-calc{ grid-area: calc; position: static; transform: none; width: auto; box-shadow: none; border: 1px solid var(--panel-border); border-radius: var(--radius); }
+      .dr-calc-screen{ font-size: 22px; padding-bottom: 6px; }
+      .dr-keys{ gap: 5px; }
+      .dr-keys button{ padding: 7px 0; font-size: 16px; }
+      #drOptions .sr-opt{ min-height: 40px; }
+    }
   </style>`);
 
   document.getElementById('app').insertAdjacentHTML('beforeend', `
@@ -587,7 +611,7 @@ if (typeof document !== 'undefined') (() => {
         <button class="btn btn-ghost" id="drCalcBtn" aria-label="Calculator">🧮</button>
       </div>
       <button class="btn btn-ghost" id="drSubmit">Hand in</button>
-    </div>
+      <p class="dr-keyhint">Keys: <b>A–E</b> or <b>1–5</b> choose · <b>← →</b> previous / next · with the calculator open, type numbers into it</p>
     <div class="dr-calc" id="drCalc" hidden>
       <div class="dr-calc-expr" id="drExpr"></div>
       <div class="dr-calc-screen" id="drScreen">0</div>
@@ -595,6 +619,7 @@ if (typeof document !== 'undefined') (() => {
         ${['C', '⌫', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '−', '1', '2', '3', '+', '0', '.', '='].map(k =>
           `<button data-k="${k}" class="${'÷×−+=C⌫%'.includes(k) ? 'op' : ''}${k === '0' ? ' wide' : ''}">${k}</button>`).join('')}
       </div>
+    </div>
     </div>
   </section>`);
 
@@ -789,6 +814,23 @@ if (typeof document !== 'undefined') (() => {
     render();
   });
   $d('drKeys').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) calcKey(b.dataset.k); });
+  // Choose with A–E (or 1–5 while the calculator is closed), move with the arrow keys
+  document.addEventListener('keydown', e => {
+    if (!g || $d('drPlay').hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+    const calcOpen = !$d('drCalc').hidden;
+    const letter = 'abcde'.indexOf(e.key.toLowerCase());
+    const digit = !calcOpen && /^[1-5]$/.test(e.key) ? Number(e.key) - 1 : -1;
+    const pickI = e.key.length === 1 && letter >= 0 ? letter : digit;
+    if (pickI >= 0 && pickI < g.qs[g.i].options.length) {
+      const q = g.qs[g.i];
+      q.given = q.given === pickI ? null : pickI;
+      render();
+      e.preventDefault();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      go(g.i + (e.key === 'ArrowLeft' ? -1 : 1));
+      e.preventDefault();
+    }
+  });
   document.addEventListener('keydown', e => {
     if (!g || $d('drPlay').hidden || $d('drCalc').hidden) return;
     const map = { '*': '×', x: '×', '/': '÷', '-': '−', '+': '+', Enter: '=', '=': '=', Backspace: '⌫', Escape: 'C', '%': '%', '.': '.', ',': '.' };

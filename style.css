@@ -1487,7 +1487,7 @@ sup{ font-size: .6em; line-height: 0; }
 
 /* ==================== DESKTOP (PitPrep website layout) ==================== */
 /* Phones keep the app layout above; these parts only show on wide screens */
-.site-nav, .hero, .section-head{ display: none; }
+.site-nav, .hero, .section-head, .bt-pane{ display: none; }
 
 @media (min-width: 900px){
   .site-nav{
@@ -1518,7 +1518,8 @@ sup{ font-size: .6em; line-height: 0; }
   body:not([data-screen]) #app, body[data-screen="home"] #app{ max-width: 1120px; }
   body[data-screen="leaders"] #app{ max-width: 820px; }
   body[data-screen="summary"] #app, body[data-screen="results"] #app{ max-width: 720px; }
-  body[data-screen="btLib"] #app, body[data-screen="btView"] #app{ max-width: 760px; }
+  body[data-screen="btView"] #app{ max-width: 760px; }
+  body[data-screen="btLib"] #app{ max-width: 1240px; }
   .screen{ min-height: calc(100dvh - 61px); }
 
   /* Home: hero, section heading, games as cards */
@@ -1546,7 +1547,20 @@ sup{ font-size: .6em; line-height: 0; }
   #home .feed{ max-width: 720px; }
   .bt-credit{ text-align: left; }
 
+  /* Puzzle library: list on the left, open puzzle on the right */
+  .bt-lib{ display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .bt-pane{
+    display: block; position: sticky; top: 76px; max-height: calc(100dvh - 96px); overflow: auto;
+    padding: 16px 20px 4px; border: 1px solid var(--panel-border); border-radius: 10px; background: #202326;
+  }
+  .bt-pane-head{ display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--panel-border); }
+  .bt-pane-head b{ font-size: 20px; }
+  .bt-pane .bt-body{ padding-top: 14px; }
+  .bt-pane .bt-q{ font-size: 18px; }
+  .bt-item.cur{ background: #33373A !important; box-shadow: inset 3px 0 0 var(--amber); }
+
   @media (max-width: 1099px){
+    .bt-lib{ grid-template-columns: 320px minmax(0, 1fr); gap: 20px; }
     .site-nav-in{ gap: 16px; }
     .site-links button{ padding: 8px 9px; }
     .site-link span{ display: none; }
@@ -1559,3 +1573,4 @@ sup{ font-size: .6em; line-height: 0; }
     .seg button:hover:not(.active){ border-color: #4A4F54; }
   }
 }
+.bt-lib-side{ display: flex; flex-direction: column; gap: 18px; min-width: 0; }

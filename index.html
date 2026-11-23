@@ -10,6 +10,18 @@
 <meta name="apple-mobile-web-app-title" content="PitPrep">
 <title>PitPrep — Internship Assessment Practice</title>
 <meta name="description" content="Free practice for internship assessments: mental maths, numerical reasoning, probability, brainteasers, trading games and poker.">
+<!-- Link previews (WhatsApp, LinkedIn, iMessage, Slack, X): image and URL must be absolute -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PitPrep">
+<meta property="og:title" content="PitPrep — Practise for internship assessments">
+<meta property="og:description" content="Free practice for the online tests in quant, trading and finance applications: mental maths, numerical reasoning, probability, brainteasers, trading games and poker.">
+<meta property="og:url" content="https://laurensvdbosch.github.io/pit-board/">
+<meta property="og:image" content="https://laurensvdbosch.github.io/pit-board/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PitPrep: practise for internship assessments">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icons/icon-192.png">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="style.css">
@@ -912,10 +924,16 @@
       <div class="round-indicator">LIBR · Puzzle library</div>
       <div class="bt-count" id="btLibCount"></div>
     </header>
-    <div class="setup-body">
-      <div class="bt-filters" id="btLibFilters"></div>
-      <div class="bt-list" id="btLibList"></div>
-      <p class="bt-credit">Puzzles marked “also on Brainstellar” are classics you can find there too: <a href="https://brainstellar.com" target="_blank" rel="noopener">brainstellar.com</a>.</p>
+    <div class="setup-body bt-lib">
+      <div class="bt-lib-side">
+        <div class="bt-filters" id="btLibFilters"></div>
+        <div class="bt-list" id="btLibList"></div>
+        <p class="bt-credit">Puzzles marked “also on Brainstellar” are classics you can find there too: <a href="https://brainstellar.com" target="_blank" rel="noopener">brainstellar.com</a>.</p>
+      </div>
+      <div class="bt-pane" id="btPane">
+        <div class="bt-pane-head"><b id="btPaneTitle"></b><span class="bt-count" id="btPanePos"></span></div>
+        <div id="btPaneSlot"></div>
+      </div>
     </div>
   </section>
 
