@@ -737,8 +737,12 @@ function addHint(mode, n, msg) {
 // ============================================================
 //  SESSION FLOW
 // ============================================================
+// Play screens run timers, so the desktop top bar hides its links there ("focus")
+const FOCUS_SCREENS = /Play$|^game$|^pokerTable$/;
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
+  document.body.dataset.screen = id;
+  document.body.classList.toggle('focus', FOCUS_SCREENS.test(id));
   window.scrollTo(0, 0);
 }
 

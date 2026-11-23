@@ -211,6 +211,14 @@ function lobbyRows(section) {
   }).join('');
 }
 
+const SECTION_INFO = {
+  math: ['🧮 Mental maths', 'Speed drills, answer sheets and multiple choice, as in the arithmetic tests of trading and quant firms.'],
+  trading: ['📈 Trading', 'Market making and arbitrage, plus the cognitive and numerical reasoning tests that come with them.'],
+  odds: ['🎲 Odds', 'A serious probability paper, and quick games on expected value and decision-making under uncertainty.'],
+  puzzles: ['🧩 Puzzles', 'Classic interview brainteasers with hints and full solutions, and a timed interview round.'],
+  poker: ['♠️ Poker', 'Play against bots and train the odds, reads and decisions behind every hand.'],
+};
+
 // Math, trading, odds, puzzles or poker, remembered between visits
 function renderSection() {
   const poker = settings.section === 'poker';
@@ -231,6 +239,14 @@ function renderSection() {
     const on = b.dataset.value === settings.section;
     b.classList.toggle('active', on);
     b.setAttribute('aria-pressed', on);
+  });
+  const [title, blurb] = SECTION_INFO[settings.section] || SECTION_INFO.trading;
+  $('sectionTitle').textContent = title;
+  $('sectionBlurb').textContent = blurb;
+  $('navLinks').querySelectorAll('[data-nav]').forEach(b => {
+    const on = b.dataset.nav === settings.section;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-current', on ? 'page' : 'false');
   });
   if (poker && typeof PokerUI !== 'undefined') PokerUI.renderHub();
   if (poker && typeof PokerTutorial !== 'undefined') PokerTutorial.maybeWelcome();
@@ -297,6 +313,23 @@ $('sectionSwitch').addEventListener('click', e => {
   saveSettings();
   renderSection();
 });
+// Desktop top bar
+$('navLinks').addEventListener('click', e => {
+  const b = e.target.closest('[data-nav]');
+  if (!b || document.body.classList.contains('focus')) return;
+  settings.section = b.dataset.nav;
+  saveSettings();
+  if ($('home').hidden) goHome(); else renderSection();
+});
+$('navHome').addEventListener('click', () => { if (!document.body.classList.contains('focus')) goHome(); });
+$('navLeaders').addEventListener('click', () => {
+  const id = { math: 'mathLeadersBtn', trading: 'leadersBtn', odds: 'oddsLeadersBtn', puzzles: 'puzzlesLeadersBtn', poker: 'pkLeadersBtn' }[settings.section] || 'leadersBtn';
+  $(id).click();
+});
+$('navPlayer').addEventListener('click', () => $('playerChip').click());
+new MutationObserver(() => { $('navPlayerName').textContent = $('playerName').textContent; })
+  .observe($('playerName'), { childList: true, characterData: true, subtree: true });
+
 $('mathModeSwitch').addEventListener('click', e => {
   const b = e.target.closest('button[data-value]');
   if (!b) return;

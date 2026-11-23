@@ -7,13 +7,33 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Pit Board">
-<title>Pit Board — Trading &amp; Quant Trainer</title>
+<meta name="apple-mobile-web-app-title" content="PitPrep">
+<title>PitPrep — Internship Assessment Practice</title>
+<meta name="description" content="Free practice for internship assessments: mental maths, numerical reasoning, probability, brainteasers, trading games and poker.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Desktop top bar (hidden on phones; links hide during a game) -->
+<header class="site-nav" id="siteNav">
+  <div class="site-nav-in">
+    <button class="site-logo" id="navHome" aria-label="PitPrep home">PIT<span>PREP</span></button>
+    <nav class="site-links" id="navLinks" aria-label="Sections">
+      <button data-nav="math">🧮 Math</button>
+      <button data-nav="trading">📈 Trading</button>
+      <button data-nav="odds">🎲 Odds</button>
+      <button data-nav="puzzles">🧩 Puzzles</button>
+      <button data-nav="poker">♠️ Poker</button>
+    </nav>
+    <div class="site-right">
+      <button class="site-link" id="navLeaders" aria-label="Leaderboards">🏆 <span>Leaderboards</span></button>
+      <button class="player-chip" id="navPlayer" title="Change name"><span class="player-dot"></span><span id="navPlayerName"></span></button>
+    </div>
+    <div class="site-focus">Game in progress</div>
+  </div>
+</header>
 
 <div id="app">
 
@@ -21,12 +41,17 @@
   <section id="home" class="screen">
     <div class="brand">
       <div>
-        <div class="brand-mark">PIT<span>BOARD</span></div>
-        <div class="brand-sub">Trading &amp; quant interview trainer</div>
+        <div class="brand-mark">PIT<span>PREP</span></div>
+        <div class="brand-sub">Internship assessment practice</div>
       </div>
       <button class="player-chip" id="playerChip" title="Change name"><span class="player-dot"></span><span id="playerName"></span></button>
     </div>
+    <div class="hero">
+      <h1>Practise for internship assessments</h1>
+      <p>The online tests that come first in quant, trading and finance applications, in one place: mental maths, numerical reasoning, probability, brainteasers, trading games and poker. Free, with leaderboards.</p>
+    </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
+    <div class="section-head" id="sectionHead"><h2 id="sectionTitle"></h2><p id="sectionBlurb"></p></div>
 
     <div class="seg seg-5 section-switch" id="sectionSwitch">
       <button data-value="math"><span class="ic" aria-hidden="true">🧮</span>Math</button>
@@ -1045,8 +1070,8 @@
   <section id="register" class="screen" hidden>
     <div class="brand">
       <div>
-        <div class="brand-mark">PIT<span>BOARD</span></div>
-        <div class="brand-sub">Trading &amp; quant interview trainer</div>
+        <div class="brand-mark">PIT<span>PREP</span></div>
+        <div class="brand-sub">Internship assessment practice</div>
       </div>
     </div>
     <form class="register-card" id="registerForm" novalidate>

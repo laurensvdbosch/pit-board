@@ -1,7 +1,7 @@
 {
-  "name": "Pit Board — Market Making Trainer",
-  "short_name": "Pit Board",
-  "description": "Practice market making and arbitrage with randomized scenarios.",
+  "name": "PitPrep — Internship Assessment Practice",
+  "short_name": "PitPrep",
+  "description": "Free practice for internship assessments: mental maths, numerical reasoning, probability, brainteasers, trading games and poker.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
