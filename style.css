@@ -1516,8 +1516,28 @@ sup{ font-size: .6em; line-height: 0; }
   /* Page widths: wide home, comfortable reading width elsewhere */
   #app{ max-width: 600px; padding-inline: 24px; min-height: calc(100dvh - 61px); }
   body:not([data-screen]) #app, body[data-screen="home"] #app{ max-width: 1120px; }
-  body[data-screen="leaders"] #app{ max-width: 820px; }
-  body[data-screen="summary"] #app, body[data-screen="results"] #app{ max-width: 720px; }
+  body[data-screen="results"] #app{ max-width: 720px; }
+  body[data-screen="summary"] #app{ max-width: 1100px; }
+  body[data-screen="leaders"] #app{ max-width: 1000px; }
+  .od-paper-opts{ grid-template-columns: repeat(3, 1fr); }
+
+  /* Results: score and buttons on the left, the review on the right */
+  #summary .results-card{ display: grid; grid-template-columns: 320px minmax(0, 1fr); column-gap: 40px; align-items: start; }
+  #summary .results-card > *{ grid-column: 1; }
+  #summary #summaryBody{ grid-column: 2; grid-row: 1 / span 20; }
+  #summary #summaryBody > h4:first-child, #summary #summaryBody > .stat-grid:first-child{ margin-top: 0; }
+
+  /* Leaderboards: tabs and filters on the left, the board on the right */
+  .leaders-body{ display: grid; grid-template-columns: 320px minmax(0, 1fr); column-gap: 28px; row-gap: 10px; align-items: start; }
+  .leaders-body > .lb-tabs, .leaders-body > .lb-filters{ grid-column: 1; }
+  .leaders-body > #lbList{ grid-column: 2; grid-row: 1 / span 3; }
+  .lb-filters .seg button{ font-size: 12px; }
+
+  /* Keyboard hints injected under the top bar */
+  .kbd-hint.auto{ margin: 8px 0 0; }
+
+  /* Footer */
+  .site-foot{ margin-top: 28px; }
   body[data-screen="btView"] #app{ max-width: 760px; }
   body[data-screen="btLib"] #app{ max-width: 1240px; }
   .screen{ min-height: calc(100dvh - 61px); }
@@ -1609,3 +1629,14 @@ sup{ font-size: .6em; line-height: 0; }
   }
 }
 .bt-lib-side{ display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+/* ==================== FOOTER & ACCESSIBILITY (all sizes) ==================== */
+.site-foot{ display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--panel-border); font-size: 12px; line-height: 1.5; color: #CFCCC5; }
+.site-foot p{ margin: 0; max-width: 760px; }
+.site-foot a{ color: var(--amber); }
+.foot-logo{ font-weight: 800; letter-spacing: -0.02em; margin-right: 6px; }
+.foot-logo span{ color: var(--amber); margin-left: 2px; }
+/* A clear outline for keyboard users only; mouse and touch taps stay clean */
+:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+.seg button:focus-visible, .btn:focus-visible, .book-row:focus-visible, .bt-item:focus-visible{ outline-offset: 1px; }
+.lb-filters .seg button{ text-align: center; }

@@ -739,10 +739,35 @@ function addHint(mode, n, msg) {
 // ============================================================
 // Play screens run timers, so the desktop top bar hides its links there ("focus")
 const FOCUS_SCREENS = /Play$|^game$|^pokerTable$/;
+// Keyboard hints, shown on desktop only (.kbd-hint). A screen can set its own in data-keys.
+const KEY_HINTS = {
+  digitsPlay: '<b>0–9</b> type · <b>Backspace</b> delete · <b>Enter</b> submit',
+  switchPlay: '<b>←</b> / <b>→</b> answer',
+  confirmPlay: '<b>1–4</b> choose',
+  seriesPlay: '<b>A–E</b> or <b>1–5</b> choose · <b>Tab</b> skip',
+  mxPlay: '<b>A–H</b> or <b>1–8</b> choose · <b>Tab</b> skip',
+  mqPlay: '<b>A–E</b> or <b>1–5</b> choose · <b>Tab</b> skip',
+  msPlay: '<b>Enter</b> jumps to the next answer box',
+  cvPlay: 'Interview format: <b>T</b> / <b>F</b> or <b>M</b> / <b>L</b> answer · <b>Enter</b> next',
+  pzPlay: '<b>1–5</b> choose · <b>Enter</b> continue',
+  btPlay: '<b>1–4</b> or <b>A–D</b> pick a choice · <b>Enter</b> submits a number',
+};
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
   document.body.dataset.screen = id;
   document.body.classList.toggle('focus', FOCUS_SCREENS.test(id));
+  const sec = document.getElementById(id);
+  const keys = sec && (sec.dataset.keys || KEY_HINTS[id]);
+  let hint = sec && sec.querySelector(':scope > .kbd-hint.auto');
+  if (keys) {
+    if (!hint) {
+      hint = document.createElement('p');
+      hint.className = 'kbd-hint auto';
+      const head = sec.querySelector(':scope > header');
+      if (head) head.after(hint); else sec.prepend(hint);
+    }
+    hint.innerHTML = `Keys: ${keys}`;
+  } else if (hint) hint.remove();
   window.scrollTo(0, 0);
 }
 

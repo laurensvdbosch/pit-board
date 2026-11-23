@@ -112,12 +112,18 @@ const MathGen = (() => {
         return { kind: 'pctSmall', html: `${p}% of ${x}`, answer: v, dist: [fx(v * 10), fx(v * 100), fx(v / 10), fx(v + p / 100)] };
       },
       fracMinusDec() {
-        const d = P([4, 5, 8, 10, 20, 25]);
-        const n = R(1, d - 1);
-        const e = R(5, 95) / 100;
-        const v = fx(n / d + e);
-        // n/d − −e  (subtracting a negative), shown the way online tests print it
-        return { kind: 'fracMinusDec', html: eq(`${frac(n, d)} ${O('−')} −${e.toFixed(2)}`), answer: v, dist: [fx(Math.abs(n / d - e)), fx(v + 0.1), fx(v - 0.1), fx(v + 1)] };
+        // n/d − −e  (subtracting a negative), shown the way online tests print it.
+        // Redraw when the distractors would collide (e.g. 1/20 and 0.05 make two of them 0).
+        for (;;) {
+          const d = P([4, 5, 8, 10, 20, 25]);
+          const n = R(1, d - 1);
+          const e = R(5, 95) / 100;
+          const v = fx(n / d + e);
+          const dist = [fx(Math.abs(n / d - e)), fx(v + 0.1), fx(v - 0.1), fx(v + 1)];
+          if (new Set([v, ...dist]).size === 5 && dist.every(x => x > 0)) {
+            return { kind: 'fracMinusDec', html: eq(`${frac(n, d)} ${O('−')} −${e.toFixed(2)}`), answer: v, dist };
+          }
+        }
       },
       missing() {
         for (;;) {

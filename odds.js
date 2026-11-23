@@ -29,6 +29,16 @@ const Odds = (() => {
   let cur = null;      // game id on the setup screen
   let run = null;      // the live game: { stop() … }
 
+  const ODDS_KEYS = {
+    prob: '<b>1–5</b> choose · <b>S</b> skip',
+    take: '<b>←</b> pass · <b>→</b> take',
+    bank: '<b>R</b> roll · <b>B</b> bank · <b>Enter</b> next round',
+    next: '<b>Q W E</b> higher 10 / 25 / 50% · <b>A S D</b> lower 10 / 25 / 50% · <b>P</b> pass',
+    urn: '<b>D</b> draw · <b>A</b> / <b>B</b> call the urn · <b>Enter</b> next round',
+    likely: '<b>←</b> / <b>→</b> or <b>1</b> / <b>2</b> pick',
+  };
+  function playScreen() { $('odPlay').dataset.keys = ODDS_KEYS[run.id] || ''; showScreen('odPlay'); }
+
   function stopRun() { if (run) { clearInterval(run.timer); clearTimeout(run.pause); run = null; } }
   const body = () => $('odBody');
   function setHud(info, time, low) {
@@ -177,7 +187,7 @@ const Odds = (() => {
     });
     store.set(RECENT, [...recent, ...qs.map(q => q.id)].slice(-(level === 1 ? 25 : 55)));
     run = { id: 'prob', qs, i: 0, level: opts.paperLevel, n: opts.paperCount, shownAt: 0, timer: null };
-    showScreen('odPlay');
+    playScreen();
     showPaper();
   }
 
@@ -244,7 +254,7 @@ const Odds = (() => {
   const TAKE_SECS = 60;
   function startTake() {
     run = { id: 'take', pnl: 0, streak: 0, best: 0, right: 0, wrong: 0, n: 0, bet: null, last: '', log: [], timer: null };
-    showScreen('odPlay');
+    playScreen();
     body().innerHTML = `
       <div class="sr-hud"><span class="sr-prompt">Edge earned</span><b id="tkPnl">$0.00</b></div>
       <div class="od-streak" id="tkStreak"></div>
@@ -300,7 +310,7 @@ const Odds = (() => {
   const BANK_ROUNDS = 10, BANK_DECISION = 10;
   function startBank() {
     run = { id: 'bank', i: 0, score: 0, cash: 0, rounds: [], timer: null, r: null, pot: 0, regret: 0, decisions: 0, lastRoll: null };
-    showScreen('odPlay');
+    playScreen();
     bankNewRound();
   }
   function bankNewRound() {
@@ -378,7 +388,7 @@ const Odds = (() => {
 
   function startNext() {
     run = { id: 'next', mode: opts.nextMode, deck: E.shuffledDeck(NEXT_CARDS), i: 0, pts: 0, best: 0, bank: 1000, log: [], last: '', timer: null };
-    showScreen('odPlay');
+    playScreen();
     nextRender();
   }
   const nextInfo = () => `NEXT · Card ${run.i + 1} of ${NEXT_CARDS - 1}`;
@@ -436,7 +446,7 @@ const Odds = (() => {
   const URN_ROUNDS = 10, URN_SECS = 240;
   function startUrn() {
     run = { id: 'urn', i: 0, score: 0, cash: 0, rounds: [], timer: null, r: null, n: 0, m: 0, regret: 0, seq: [] };
-    showScreen('odPlay');
+    playScreen();
     urnNew();
     countdown(URN_SECS, finishUrn, 20, () => `URNS · Round ${Math.min(run.i + 1, URN_ROUNDS)} of ${URN_ROUNDS}`);
   }
@@ -510,7 +520,7 @@ const Odds = (() => {
   const LIVES = 3, LIKELY_PAUSE = 900;
   function startLikely() {
     run = { id: 'likely', solved: 0, lives: LIVES, pair: null, locked: false, misses: [], timer: null, pause: null };
-    showScreen('odPlay');
+    playScreen();
     likelyNext();
   }
   function likelyNext() {
@@ -618,6 +628,18 @@ const Odds = (() => {
     else if (run.id === 'prob' && /^[1-5]$/.test(e.key)) paperAnswer(Number(e.key) - 1);
     else if (run.id === 'likely' && (e.key === 'ArrowLeft' || e.key === '1')) likelyPick(0);
     else if (run.id === 'likely' && (e.key === 'ArrowRight' || e.key === '2')) likelyPick(1);
+    else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length <= 5) {
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      const sel = {
+        prob: { s: '[data-a="skip"]' },
+        bank: { r: '#bkRoll', b: '#bkBank', Enter: '#bkNext' },
+        next: { q: '[data-side="higher"][data-f="0.1"]', w: '[data-side="higher"][data-f="0.25"]', e: '[data-side="higher"][data-f="0.5"]',
+                a: '[data-side="lower"][data-f="0.1"]', s: '[data-side="lower"][data-f="0.25"]', d: '[data-side="lower"][data-f="0.5"]', p: '#nxPass' },
+        urn: { d: '#unDraw', a: '#unA', b: '#unB', Enter: '#unNext' },
+      }[run.id];
+      const b = sel && sel[k] && body().querySelector(sel[k]);
+      if (b && !b.disabled) b.click(); else used = false;
+    }
     else used = false;
     if (used) e.preventDefault();
   });

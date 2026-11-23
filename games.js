@@ -243,13 +243,18 @@ function renderSection() {
   const [title, blurb] = SECTION_INFO[settings.section] || SECTION_INFO.trading;
   $('sectionTitle').textContent = title;
   $('sectionBlurb').textContent = blurb;
+  syncNav();
+  if (poker && typeof PokerUI !== 'undefined') PokerUI.renderHub();
+  if (poker && typeof PokerTutorial !== 'undefined') PokerTutorial.maybeWelcome();
+}
+
+// Desktop top bar: highlight the current section
+function syncNav() {
   $('navLinks').querySelectorAll('[data-nav]').forEach(b => {
     const on = b.dataset.nav === settings.section;
     b.classList.toggle('active', on);
     b.setAttribute('aria-current', on ? 'page' : 'false');
   });
-  if (poker && typeof PokerUI !== 'undefined') PokerUI.renderHub();
-  if (poker && typeof PokerTutorial !== 'undefined') PokerTutorial.maybeWelcome();
 }
 
 function goHome() {
@@ -259,6 +264,7 @@ function goHome() {
 
 function openGame(id) {
   settings.lastGame = id;
+  if (GAMES[id]) { settings.section = GAMES[id].section || 'trading'; syncNav(); }
   if (GAMES[id].open) { saveSettings(); GAMES[id].open(); return; }   // self-registering games
   if (PUZZLE_ROUNDS[id]) {
     PokerPuzzles.openSetup(id);
