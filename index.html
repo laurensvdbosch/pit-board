@@ -34,6 +34,7 @@
     <button class="site-logo" id="navHome" aria-label="PitPrep home">PIT<span>PREP</span></button>
     <nav class="site-links" id="navLinks" aria-label="Sections">
       <button data-nav="math">🧮 Math</button>
+      <button data-nav="aptitude">🧠 Aptitude</button>
       <button data-nav="trading">📈 Trading</button>
       <button data-nav="odds">🎲 Odds</button>
       <button data-nav="puzzles">🧩 Puzzles</button>
@@ -67,6 +68,7 @@
 
     <div class="seg seg-5 section-switch" id="sectionSwitch">
       <button data-value="math"><span class="ic" aria-hidden="true">🧮</span>Math</button>
+      <button data-value="aptitude"><span class="ic" aria-hidden="true">🧠</span>Aptitude</button>
       <button data-value="trading"><span class="ic" aria-hidden="true">📈</span>Trading</button>
       <button data-value="odds"><span class="ic" aria-hidden="true">🎲</span>Odds</button>
       <button data-value="puzzles"><span class="ic" aria-hidden="true">🧩</span>Puzzles</button>
@@ -86,6 +88,14 @@
         <div id="mathList"></div>
       </div>
       <button class="btn btn-ghost btn-leaders" id="mathLeadersBtn">🏆 Math leaderboards</button>
+    </div>
+
+    <div class="home-section" id="aptitudeSection" hidden>
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Aptitude</span><span>Progress</span></div>
+        <div id="aptitudeList"></div>
+      </div>
+      <p class="field-help apt-note">No leaderboards here on purpose. These tests are about judgement and fit, so the goal is to understand the reasoning, not to chase a score.</p>
     </div>
 
     <div class="home-section" id="tradingSection">
@@ -925,6 +935,46 @@
     </div>
   </section>
 
+  <!-- ==================== APTITUDE: SITUATIONAL JUDGEMENT ==================== -->
+  <section id="sjSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="sjBack" aria-label="Back to games">←</button>
+      <div class="round-indicator">SJT · Situational judgement</div>
+    </header>
+    <div class="setup-body">
+      <div class="sj-yourself">
+        <h3>Before you start: be yourself</h3>
+        <p>Situational judgement tests check how you would <b>naturally</b> act at work, measured against the values of the company you're applying to. There is no single universal answer.</p>
+        <ul>
+          <li><b>Learn the reasoning, don't memorise answers.</b> Use this to understand what good professional judgement looks like and to get used to the formats. Real tests use different scenarios, so copying answers from here won't help.</li>
+          <li><b>Answer as you would genuinely act at your best.</b> Employers compare your answers with personality questionnaires and interviews, and faking it can land you in a role that doesn't suit you.</li>
+          <li><b>Read the company's values first.</b> Firms weigh things like speed, caution and client focus differently. Our ratings reflect common professional norms, not any one employer's key.</li>
+        </ul>
+      </div>
+      <div id="sjOptions" class="od-options"></div>
+      <p class="field-help" id="sjPool"></p>
+      <button class="btn btn-primary btn-start" id="sjStart">Start</button>
+      <details class="howto">
+        <summary>How it works</summary>
+        <div><ul>
+          <li><b>Most &amp; least:</b> pick the most effective and the least effective response. One point for each that matches the key.</li>
+          <li><b>Rate each:</b> rate every response from 1 (counterproductive) to 4 (very effective). Two points for the key's rating, one if you're one step off.</li>
+          <li><b>Practice</b> shows the key and the reasoning for every response straight after you answer. <b>Assessment</b> gives you 1.5 minutes per scenario and all the feedback at the end. Many real SJTs are untimed or loosely timed.</li>
+          <li>Nothing here is ranked or posted. Your progress is kept on this device only.</li>
+        </ul></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="sjPlay" class="screen" hidden>
+    <header class="topbar ms-top">
+      <button class="icon-btn" id="sjQuit" aria-label="Quit">✕</button>
+      <div class="round-indicator" id="sjInfo"></div>
+      <div class="timer" id="sjTimer"></div>
+    </header>
+    <div class="bt-body sj-body" id="sjBody"></div>
+  </section>
+
   <!-- ==================== PUZZLES ==================== -->
   <section id="btLib" class="screen" hidden>
     <header class="topbar">
@@ -1154,6 +1204,8 @@
 <script src="odds.js"></script>
 <script src="puzzle-bank.js"></script>
 <script src="puzzles.js"></script>
+<script src="sjt-bank.js"></script>
+<script src="sjt.js"></script>
 <script src="digits.js"></script>
 <script src="switch.js"></script>
 <script src="confirm.js"></script>

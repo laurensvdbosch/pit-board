@@ -184,6 +184,7 @@ function renderLobby() {
   $('mathList').innerHTML = lobbyRows('math');
   $('oddsList').innerHTML = lobbyRows('odds');
   $('puzzlesList').innerHTML = lobbyRows('puzzles');
+  $('aptitudeList').innerHTML = lobbyRows('aptitude');
   if (typeof Online !== 'undefined') Online.homeExtras();
   renderSection();
 }
@@ -212,6 +213,7 @@ function lobbyRows(section) {
 }
 
 const SECTION_INFO = {
+  aptitude: ['🧠 Aptitude', 'The non-numerical tests used by banks, consultancies, the Big 4 and graduate schemes. Learn the reasoning; nothing here is ranked.'],
   math: ['🧮 Mental maths', 'Speed drills, answer sheets and multiple choice, as in the arithmetic tests of trading and quant firms.'],
   trading: ['📈 Trading', 'Market making and arbitrage, plus the cognitive and numerical reasoning tests that come with them.'],
   odds: ['🎲 Odds', 'A serious probability paper, and quick games on expected value and decision-making under uncertainty.'],
@@ -234,6 +236,7 @@ function renderSection() {
   $('tradingSection').hidden = settings.section !== 'trading';
   $('oddsSection').hidden = settings.section !== 'odds';
   $('puzzlesSection').hidden = settings.section !== 'puzzles';
+  $('aptitudeSection').hidden = settings.section !== 'aptitude';
   $('pokerSection').hidden = !poker;
   $('sectionSwitch').querySelectorAll('button').forEach(b => {
     const on = b.dataset.value === settings.section;
@@ -250,6 +253,7 @@ function renderSection() {
 
 // Desktop top bar: highlight the current section
 function syncNav() {
+  $('navLeaders').hidden = settings.section === 'aptitude';   // nothing ranked there
   $('navLinks').querySelectorAll('[data-nav]').forEach(b => {
     const on = b.dataset.nav === settings.section;
     b.classList.toggle('active', on);
@@ -306,6 +310,7 @@ function showSummary(opts) {
       ? '<span class="ok">New personal best!</span>'
       : `Your best: ${fmtScore(mode, prev)}`;
   $('summaryBody').innerHTML = opts.bodyHtml;
+  $('summaryLeadersBtn').hidden = Boolean(GAMES[mode] && GAMES[mode].noBoard);
   $('summaryRank').textContent = '';
   showScreen('summary');
   if (!practice && typeof Online !== 'undefined') Online.recordScore(opts.board, opts.score, $('summaryRank'));
@@ -343,7 +348,7 @@ $('mathModeSwitch').addEventListener('click', e => {
   saveSettings();
   renderLobby();
 });
-['gameList', 'mathList', 'oddsList', 'puzzlesList'].forEach(list => $(list).addEventListener('click', e => {
+['gameList', 'mathList', 'oddsList', 'puzzlesList', 'aptitudeList'].forEach(list => $(list).addEventListener('click', e => {
   const row = e.target.closest('[data-game]');
   if (row) openGame(row.dataset.game);
 }));

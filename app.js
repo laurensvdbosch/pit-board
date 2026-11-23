@@ -175,7 +175,7 @@ if (!['easy', 'hard'].includes(settings.confirmLen)) settings.confirmLen = 'easy
 if (![1, 2, 3].includes(settings.confirmSpeed)) settings.confirmSpeed = 1;
 if (!['arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'conv', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'].includes(settings.lastGame)) settings.lastGame = 'arb';
 if (!['test', 'survival'].includes(settings.matrixMode)) settings.matrixMode = 'test';
-if (!['math', 'trading', 'odds', 'puzzles', 'poker'].includes(settings.section)) settings.section = 'trading';
+if (!['math', 'aptitude', 'trading', 'odds', 'puzzles', 'poker'].includes(settings.section)) settings.section = 'trading';
 if (!['regular', 'assess'].includes(settings.sheetPace)) settings.sheetPace = 'regular';
 if (![10, 20, 50].includes(settings.sheetCount)) settings.sheetCount = 20;
 if (!['easy', 'medium', 'hard'].includes(settings.quizLevel)) settings.quizLevel = 'medium';
@@ -751,6 +751,7 @@ const KEY_HINTS = {
   cvPlay: 'Interview format: <b>T</b> / <b>F</b> or <b>M</b> / <b>L</b> answer · <b>Enter</b> next',
   pzPlay: '<b>1–5</b> choose · <b>Enter</b> continue',
   btPlay: '<b>1–4</b> or <b>A–D</b> pick a choice · <b>Enter</b> submits a number',
+  sjPlay: '<b>Enter</b> check / next scenario',
 };
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
