@@ -31,6 +31,29 @@ const SJT = (() => {
   const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const pct = (got, max) => (max ? Math.round((100 * got) / max) : 0);
 
+  // "I disagree with this answer": sent to a private table (supabase/admin.sql reads it).
+  // One flag per scenario per device.
+  const FLAGGED = 'pitboard-sjt-flagged';
+  const flagged = store.get(FLAGGED, []);
+  const shortText = t => (t.length > 70 ? `${t.slice(0, 67)}…` : t);
+  const flagHtml = (sc, order) => (flagged.includes(sc.id)
+    ? '<p class="sj-flag-done">🚩 You flagged this scenario. Thanks!</p>'
+    : `<div class="sj-flag" data-scn="${sc.id}">
+        <button class="sj-flag-open" type="button">🚩 I disagree with this answer</button>
+        <form class="sj-flag-form" hidden>
+          <label class="field-label">Which response do you disagree with?</label>
+          <select name="resp" class="sj-flag-select">
+            <option value="">The scenario as a whole</option>
+            ${order.map((k, pos) => `<option value="${k}">${'ABCD'[pos]}. ${esc(shortText(sc.r[k][0]))}</option>`).join('')}
+          </select>
+          <label class="field-label">What would you rate it? (optional)</label>
+          <div class="sj-flag-rate">${[1, 2, 3, 4].map(v => `<label><input type="radio" name="sug" value="${v}"> <b>${v}</b> ${S.RATING[v].toLowerCase()}</label>`).join('')}</div>
+          <textarea name="note" class="sj-flag-note" maxlength="300" rows="3" placeholder="Why? (optional, up to 300 characters)"></textarea>
+          <div class="sj-flag-btns"><button class="btn btn-primary" type="submit">Send</button><button class="btn btn-ghost sj-flag-cancel" type="button">Cancel</button></div>
+          <p class="sj-flag-msg" aria-live="polite"></p>
+        </form>
+      </div>`);
+
   // ================================================================
   //  REGISTRATION (no board: practice only, never posted)
   // ================================================================
@@ -139,6 +162,7 @@ const SJT = (() => {
       ${legend}
       <div class="sj-list">${rows}</div>
       ${result}
+      ${done ? flagHtml(sc, it.order) : ''}
       <div class="sj-actions">${action}${!r.assess && r.i > 0 ? '<button class="btn btn-ghost" id="sjFinish">Finish practice</button>' : ''}</div>`;
     if (top) window.scrollTo(0, 0);
   }
@@ -180,13 +204,15 @@ const SJT = (() => {
     const got = items.reduce((s, it) => s + it.pts, 0);
     const total = r.assess ? r.items.length : items.length;
     const overall = pct(got, total * max);
+    // Practice only covers what you answered; an assessment counts unanswered scenarios as 0
+    const shown = r.assess ? r.items : items;
     const groups = (key, names) => Object.entries(names).map(([k, label]) => {
-      const list = r.items.filter(it => it.sc[key] === k);
+      const list = shown.filter(it => it.sc[key] === k);
       if (!list.length) return '';
       const p = pct(list.reduce((s, it) => s + (it.checked ? it.pts : 0), 0), list.length * max);
       return `<div class="sj-bar"><span>${label}</span><div class="sj-track"><i style="width:${p}%"></i></div><b>${p}%</b></div>`;
     }).join('');
-    const review = r.items.map((it, i) => {
+    const review = shown.map((it, i) => {
       const sc = it.sc;
       const p = it.checked ? pct(it.pts, max) : null;
       const lines = it.order.map((k, pos) => {
@@ -198,7 +224,7 @@ const SJT = (() => {
         <li class="sr-item ${p === null ? 'skip' : p >= 75 ? 'ok' : p >= 50 ? '' : 'bad'}">
           <div class="sr-item-head"><span>${i + 1}. ${esc(sc.t)}</span><span class="sr-pts">${p === null ? 'not answered' : `${p}%`}</span></div>
           <small class="dim">${SEC_SHORT[sc.sec]} · ${COMP[sc.comp]}</small>
-          <details class="bt-review"><summary>Scenario and feedback</summary><p class="bt-review-q">${esc(sc.s)}</p><ol class="sj-review-list">${lines}</ol></details>
+          <details class="bt-review"><summary>Scenario and feedback</summary><p class="bt-review-q">${esc(sc.s)}</p><ol class="sj-review-list">${lines}</ol>${flagHtml(sc, it.order)}</details>
         </li>`;
     }).join('');
     showSummary({
@@ -264,8 +290,39 @@ const SJT = (() => {
     else if (t.id === 'sjNext') next();
     else if (t.id === 'sjFinish') finish(false);
   });
+  // Flag form, wherever it appears (after a practice check, or in the results)
+  document.addEventListener('click', e => {
+    const open = e.target.closest('.sj-flag-open'), cancel = e.target.closest('.sj-flag-cancel');
+    const box = (open || cancel) && (open || cancel).closest('.sj-flag');
+    if (!box) return;
+    box.querySelector('.sj-flag-form').hidden = Boolean(cancel);
+    box.querySelector('.sj-flag-open').hidden = !cancel;
+    if (open) box.querySelector('.sj-flag-select').focus();
+  });
+  document.addEventListener('submit', async e => {
+    const form = e.target.closest && e.target.closest('.sj-flag-form');
+    if (!form) return;
+    e.preventDefault();
+    const box = form.closest('.sj-flag'), id = box.dataset.scn, sc = BANK.find(x => x.id === id);
+    const resp = form.resp.value === '' ? null : Number(form.resp.value);
+    const sug = form.querySelector('input[name="sug"]:checked');
+    const msg = form.querySelector('.sj-flag-msg'), btn = form.querySelector('[type="submit"]');
+    if (!sc || typeof Online === 'undefined' || !Online.flagSJT) { msg.textContent = "Couldn't send right now."; return; }
+    btn.disabled = true;
+    msg.textContent = 'Sending…';
+    try {
+      await Online.flagSJT({ scenario: id, response: resp, text: resp === null ? null : sc.r[resp][0].slice(0, 160), suggested: sug ? Number(sug.value) : null, note: form.note.value.trim() || null });
+      flagged.push(id);
+      store.set(FLAGGED, flagged);
+      box.outerHTML = '<p class="sj-flag-done">🚩 Thanks, your flag was sent. It helps improve these answers.</p>';
+    } catch (err) {
+      btn.disabled = false;
+      msg.textContent = err.message === 'too_many' ? 'Too many flags from this network in the last hour. Try again later.' : "Couldn't send right now. Check your connection and try again.";
+    }
+  });
+
   document.addEventListener('keydown', e => {
-    if (!run || $('sjPlay').hidden || e.key !== 'Enter' || (e.target.closest && e.target.closest('input, textarea'))) return;
+    if (!run || $('sjPlay').hidden || e.key !== 'Enter' || (e.target.closest && e.target.closest('input, textarea, select'))) return;
     const b = $('sjCheck') || $('sjNext');
     if (b && !b.disabled) { b.click(); e.preventDefault(); }
   });

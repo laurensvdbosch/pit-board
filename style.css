@@ -1706,3 +1706,18 @@ sup{ font-size: .6em; line-height: 0; }
   body[data-screen="sjPlay"] #app{ max-width: 780px; }
   .sj-scn{ font-size: 18px; }
 }
+
+/* SJT: "I disagree with this answer" */
+.sj-flag-open{ align-self: flex-start; padding: 6px 0; background: none; border: none; font-size: 13px; font-weight: 700; color: var(--chalk-dim); text-decoration: underline; text-underline-offset: 3px; }
+.sj-flag-open:hover{ color: var(--chalk); }
+.sj-flag-form{ display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 12px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.sj-flag-form .field-label{ margin: 4px 0 0; }
+.sj-flag-select, .sj-flag-note{ width: 100%; padding: 9px 10px; font: inherit; font-size: 14px; color: var(--chalk); background: var(--board); border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.sj-flag-note{ resize: vertical; }
+.sj-flag-rate{ display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 13px; color: #CFCCC5; }
+.sj-flag-rate input{ accent-color: var(--amber); }
+.sj-flag-btns{ display: flex; gap: 8px; }
+.sj-flag-btns .btn{ padding: 10px 0; font-size: 14px; }
+.sj-flag-msg{ margin: 0; font-size: 13px; color: var(--amber); }
+.sj-flag-msg:empty{ display: none; }
+.sj-flag-done{ margin: 4px 0 0; font-size: 13px; color: var(--gain); }

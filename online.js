@@ -346,5 +346,8 @@ const Online = (() => {
 
   if (profile) { homeExtras(); flush(); } else showRegister('join');
 
-  return { homeExtras, recordScore, flush, openLeaders };
+  // "I disagree with this answer" on an SJT scenario (no account needed)
+  const flagSJT = f => rpc('sjt_flag', { p_scenario: f.scenario, p_response: f.response, p_text: f.text, p_suggested: f.suggested, p_note: f.note });
+
+  return { homeExtras, recordScore, flush, openLeaders, flagSJT };
 })();

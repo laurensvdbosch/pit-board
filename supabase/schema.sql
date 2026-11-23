@@ -90,6 +90,21 @@ create table if not exists public.pb_rate (
 );
 create index if not exists pb_rate_k on public.pb_rate (k, at);
 
+-- "I disagree with this answer" flags on SJT scenarios. Private: only readable
+-- in the SQL Editor (see supabase/admin.sql). response = the response's place
+-- in sjt-bank.js (0-3, not the letter on screen), null = the scenario as a whole.
+create table if not exists public.sjt_flags (
+  id bigint generated always as identity primary key,
+  scenario text not null,
+  response int check (response between 0 and 3),
+  response_text text check (char_length(response_text) <= 160),
+  suggested int check (suggested between 1 and 4),
+  note text check (char_length(note) <= 300),
+  created_at timestamptz not null default now()
+);
+alter table public.sjt_flags add column if not exists response_text text check (char_length(response_text) <= 160);
+create index if not exists sjt_flags_scenario on public.sjt_flags (scenario, created_at desc);
+
 -- ---------- access rules ----------
 alter table public.players        enable row level security;
 alter table public.player_secrets enable row level security;
@@ -97,6 +112,7 @@ alter table public.best_scores    enable row level security;
 alter table public.best_events    enable row level security;
 alter table public.pb_blocked_words enable row level security;   -- no policies: not readable from the app
 alter table public.pb_rate          enable row level security;
+alter table public.sjt_flags        enable row level security;   -- no policies: write-only through sjt_flag()
 
 -- Used by the read policies. Security definer, so it sees hidden players too.
 create or replace function public.pb_is_hidden(p_player uuid) returns boolean
@@ -112,7 +128,7 @@ create policy "public read" on public.best_scores for select using (not public.p
 create policy "public read" on public.best_events for select using (not public.pb_is_hidden(player_id));
 -- player_secrets has no policy at all: unreadable from the app
 
-revoke all on public.players, public.player_secrets, public.best_scores, public.best_events, public.pb_blocked_words, public.pb_rate from anon, authenticated;
+revoke all on public.players, public.player_secrets, public.best_scores, public.best_events, public.pb_blocked_words, public.pb_rate, public.sjt_flags from anon, authenticated;
 grant select on public.players, public.best_scores, public.best_events to anon, authenticated;
 
 -- ---------- functions ----------
@@ -302,7 +318,25 @@ begin
   return json_build_object('is_best', true, 'best', v_score, 'prev', v_prev);
 end $$;
 
--- Only the three public entry points are callable from the app
+-- Flag an SJT scenario you disagree with. No account needed; 30 flags per network per hour.
+create or replace function public.sjt_flag(p_scenario text, p_response int, p_text text, p_suggested int, p_note text) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_note text := nullif(left(btrim(coalesce(p_note, '')), 300), '');
+begin
+  if p_scenario is null or p_scenario !~ '^(fin|pro|gen)-[a-z0-9-]{2,50}$' then
+    raise exception 'invalid_flag';
+  end if;
+  if (p_response is not null and p_response not between 0 and 3)
+     or (p_suggested is not null and p_suggested not between 1 and 4) then
+    raise exception 'invalid_flag';
+  end if;
+  perform pb_rate_limit('flag:' || pb_client_key(), 30, interval '1 hour');
+  insert into sjt_flags (scenario, response, response_text, suggested, note)
+  values (p_scenario, p_response, nullif(left(btrim(coalesce(p_text, '')), 160), ''), p_suggested, v_note);
+end $$;
+
+-- Only these public entry points are callable from the app
 revoke all on function public.pb_hash(text) from public, anon, authenticated;
 revoke all on function public.pb_check_secret(uuid, text) from public, anon, authenticated;
 revoke all on function public.pb_clean_name(text) from public, anon, authenticated;
@@ -317,5 +351,7 @@ revoke all on function public.submit_score(uuid, text, text, text, int, numeric)
 grant execute on function public.register_player(text) to anon, authenticated;
 grant execute on function public.rename_player(uuid, text, text) to anon, authenticated;
 grant execute on function public.submit_score(uuid, text, text, text, int, numeric) to anon, authenticated;
+revoke all on function public.sjt_flag(text, int, text, int, text) from public;
+grant execute on function public.sjt_flag(text, int, text, int, text) to anon, authenticated;
 
 notify pgrst, 'reload schema';

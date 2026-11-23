@@ -388,6 +388,372 @@ const SJT_BANK = [
       ['Ask your manager which meetings matter most.', 3, 'Sensible, though you can usually judge most of it yourself first.'],
     ],
   },
+
+  // ======================= MORE FINANCE =======================
+  {
+    id: 'fin-code-rewrite', sec: 'fin', comp: 'learning', t: 'Your code, rewritten',
+    s: 'A senior quant reviews your pricing code and rewrites half of it without explaining why.',
+    r: [
+      ['Ask them to walk you through the main changes when they have a moment, so you understand the reasons.', 4, 'Understanding why it was changed is how you stop the same issues coming back.'],
+      ['Accept the changes and move on.', 2, 'The code is better, but you\'ve learned nothing from it.'],
+      ['Change it back where you preferred your own version.', 1, 'Undoing a senior\'s review without discussing it damages trust and may reintroduce bugs.'],
+      ['Study the changes yourself and keep notes on the patterns they used.', 3, 'Good self-directed learning; a short conversation would fill the gaps faster.'],
+    ],
+  },
+  {
+    id: 'fin-same-mistake', sec: 'fin', comp: 'learning', t: 'The same mistake, three times',
+    s: 'Your manager points out the same formatting mistake in your pitch book for the third time.',
+    r: [
+      ['Apologise, and make a short checklist you run through before sending anything.', 4, 'A simple system fixes a repeated mistake in a way good intentions don\'t.'],
+      ['Explain that formatting isn\'t the important part of the work.', 1, 'In client-facing work, presentation is part of quality; dismissing it looks careless.'],
+      ['Ask a colleague to check your work every time.', 2, 'It catches the error, but uses someone else\'s time instead of fixing the habit.'],
+      ['Fix it and promise to be more careful.', 3, 'The right attitude, but a promise alone hasn\'t worked twice already.'],
+    ],
+  },
+  {
+    id: 'fin-quiet-week', sec: 'fin', comp: 'initiative', t: 'A quiet week on the desk',
+    s: 'It\'s a quiet week on the desk and nobody has given you any work.',
+    r: [
+      ['Ask your manager or senior colleagues what would help, and suggest a small piece of research you could do.', 4, 'Asking and proposing something concrete shows initiative while staying useful to the team.'],
+      ['Read the news and wait to be asked.', 2, 'Keeping up with markets helps, but waiting looks passive.'],
+      ['Prepare a short note on a topic you think the desk would find useful, then share it.', 3, 'Proactive and helpful; checking what the desk needs first would make it more useful.'],
+      ['Leave early, since there\'s nothing to do.', 1, 'Being visibly absent in a quiet week is noticed and suggests a lack of interest.'],
+    ],
+  },
+  {
+    id: 'fin-client-faq', sec: 'fin', comp: 'initiative', t: 'The same question from every client',
+    s: 'While preparing client reports, you notice that several clients are asking the same question about a new regulation.',
+    r: [
+      ['Suggest to your manager a short note for all clients on the topic, and offer to draft it.', 4, 'Spotting a pattern and offering a scalable fix is valuable initiative, with your manager\'s approval.'],
+      ['Keep answering each client separately as the questions come in.', 3, 'Every client gets an answer, but the team repeats the same work.'],
+      ['Write a note and send it to all clients yourself.', 1, 'Client communication on regulation must be approved; sending it yourself is a real risk.'],
+      ['Mention it to a colleague in passing.', 2, 'The idea may never reach someone who can act on it.'],
+    ],
+  },
+  {
+    id: 'fin-no-offer', sec: 'fin', comp: 'resilience', t: 'No return offer',
+    s: 'You don\'t get the return offer you hoped for after your summer internship. Another bank has invited you to its graduate assessment centre next month.',
+    r: [
+      ['Ask for feedback on your internship, work on the points raised, and prepare for the new assessment centre.', 4, 'Turning a setback into specific improvements is exactly what resilience looks like.'],
+      ['Decide finance isn\'t for you and withdraw from the assessment centre.', 1, 'One outcome rarely means the whole path is wrong; withdrawing throws away a real chance.'],
+      ['Go to the assessment centre without thinking about what happened.', 2, 'You keep going, but may repeat whatever held you back.'],
+      ['Take a week to reset, then prepare properly for the new assessment centre.', 3, 'Healthy and forward-looking; feedback from the internship would make the preparation sharper.'],
+    ],
+  },
+  {
+    id: 'fin-volatile-day', sec: 'fin', comp: 'resilience', t: 'The same report, four times',
+    s: 'On a very volatile market day, you\'re asked to update the same risk report four times as prices keep moving.',
+    r: [
+      ['Stay calm, update it each time, and later suggest an automatic refresh for days like this.', 4, 'Composed under pressure, and turning the frustration into an improvement.'],
+      ['Complain to the team that the requests are pointless.', 1, 'Risk numbers matter most on volatile days; complaining shows poor judgement and hurts morale.'],
+      ['Update it carefully each time without comment.', 3, 'Reliable and calm; suggesting an improvement afterwards would add more.'],
+      ['Update it less carefully each time to keep up.', 2, 'Speed matters, but a sloppy risk report on a volatile day can be costly.'],
+    ],
+  },
+  {
+    id: 'fin-busy-md-email', sec: 'fin', comp: 'communication', t: 'An email to a busy MD',
+    s: 'You need to tell a busy MD that a client meeting has moved and that two documents need changes before it.',
+    r: [
+      ['Send a short email with the key facts first: the new time, what needs changing, and what you need from them.', 4, 'Busy senior people read the first lines; leading with facts and the ask gets action.'],
+      ['Write a long email explaining the full background.', 2, 'Complete, but the key points may be missed.'],
+      ['Wait until you see them in person.', 1, 'Time-sensitive information shouldn\'t depend on bumping into someone.'],
+      ['Message the new time on chat, and send the document details by email.', 3, 'Quick, though splitting it across channels makes it easier to miss part.'],
+    ],
+  },
+  {
+    id: 'fin-flawed-proposal', sec: 'fin', comp: 'communication', t: 'You see a flaw',
+    s: 'In a team meeting, your VP proposes an approach that you think rests on a flawed assumption.',
+    r: [
+      ['Raise it respectfully, explain the assumption and its effect, and ask whether you\'ve missed something.', 4, 'Constructive challenge, open to being wrong, is valued at every level.'],
+      ['Say nothing; they\'re more senior.', 2, 'Seniority doesn\'t make an assumption right, and the team may build on the flaw.'],
+      ['Tell the VP in front of everyone that the approach is wrong.', 1, 'Blunt public contradiction puts people on the defensive and the point gets lost.'],
+      ['Mention it to the VP privately after the meeting.', 3, 'Respectful and safe, though the team may already be moving on it.'],
+    ],
+  },
+  {
+    id: 'fin-confirm-error', sec: 'fin', comp: 'client', t: 'The client spots your error',
+    s: 'A client points out an error in a trade confirmation you prepared.',
+    r: [
+      ['Thank them, confirm the error, correct it immediately, and tell your manager what happened.', 4, 'Fast, honest correction keeps the client\'s trust, and your manager isn\'t surprised later.'],
+      ['Fix it quietly without telling your manager.', 2, 'The client gets the fix, but your manager may need to know about errors that reach clients.'],
+      ['Tell the client the system caused the error.', 1, 'Deflecting blame to a system the client can\'t see sounds like an excuse and erodes trust.'],
+      ['Apologise and pass it to the operations team to fix.', 3, 'Responsive, but owning the follow-up yourself is better than handing it off.'],
+    ],
+  },
+  {
+    id: 'fin-twenty-minutes', sec: 'fin', comp: 'priorities', t: 'A chart in 20 minutes',
+    s: 'Your manager asks for a quick chart for a meeting in 20 minutes. You\'re halfway through an analysis due tomorrow.',
+    r: [
+      ['Make the chart now, check it, and then go back to the analysis.', 4, 'The chart is urgent and short; tomorrow\'s deadline still has room.'],
+      ['Say you\'re busy and offer to do it after the meeting.', 2, 'Help after the meeting is no help for the meeting.'],
+      ['Make a rushed chart in five minutes without checking the numbers.', 1, 'A wrong number in a meeting is worse than no chart at all.'],
+      ['Ask a colleague whether they can make the chart.', 3, 'May work, but it hands off a quick task your manager asked you for.'],
+    ],
+  },
+  {
+    id: 'fin-holiday-handover', sec: 'fin', comp: 'teamwork', t: 'Holiday during a live deal',
+    s: 'You\'re going on holiday for a week in the middle of a live deal.',
+    r: [
+      ['Write a clear handover note, walk a colleague through it, and say how to reach you in an emergency.', 4, 'A proper handover protects the deal and your colleagues, and lets you switch off.'],
+      ['Leave your files on the shared drive.', 2, 'The files are there, but nobody knows where things stand.'],
+      ['Tell nobody and deal with any questions when you\'re back.', 1, 'Leaving a live deal with no handover puts the team and the client at risk.'],
+      ['Send a handover email the evening before you leave.', 3, 'Useful, but there\'s no time left for questions.'],
+    ],
+  },
+  {
+    id: 'fin-broker-tickets', sec: 'fin', comp: 'integrity', t: 'Concert tickets from a broker',
+    s: 'A broker you deal with offers you expensive concert tickets.',
+    r: [
+      ['Check the gifts policy and with compliance before accepting, and record it if it\'s allowed.', 4, 'Gifts can create conflicts of interest; following the policy protects you and the firm.'],
+      ['Accept; it\'s normal in the industry.', 1, 'Expensive gifts can breach rules on inducements, and "everyone does it" is no defence.'],
+      ['Decline politely without checking anything.', 3, 'Safe, though the policy might have allowed it if recorded properly.'],
+      ['Accept, and mention it to your manager afterwards.', 2, 'Being open is good, but compliance needs to approve before you accept, not after.'],
+    ],
+  },
+
+  // ============== MORE CONSULTING & BIG 4 ==============
+  {
+    id: 'pro-talked-too-much', sec: 'pro', comp: 'learning', t: '"You didn\'t let the client talk"',
+    s: 'After a client workshop, a partner tells you that you spoke too much and didn\'t give the client room to talk.',
+    r: [
+      ['Thank them, ask what they\'d have done differently, and focus on listening in the next session.', 4, 'Open, specific and acted on: the most effective way to take feedback.'],
+      ['Explain that the client seemed engaged.', 2, 'You may see it differently, but defending yourself first sounds like you aren\'t listening.'],
+      ['Tell colleagues the partner was being unfair.', 1, 'Complaining about feedback behind someone\'s back harms your reputation more than the feedback did.'],
+      ['Note it, and watch how the partner runs the next workshop.', 3, 'Good learning by observation; asking directly would add detail.'],
+    ],
+  },
+  {
+    id: 'pro-new-tool', sec: 'pro', comp: 'learning', t: 'A tool you\'ve never used',
+    s: 'Your team uses a data tool you\'ve never used, and you\'re expected to work with it from next week.',
+    r: [
+      ['Do the internal training, and ask a colleague to show you how the team uses it.', 4, 'Formal training plus how the team really works with it gets you ready fastest.'],
+      ['Wait and learn it once the work starts.', 2, 'You\'ll learn it, but slowly and under deadline pressure.'],
+      ['Tell your manager you\'re not familiar with it and hope someone else takes that part.', 1, 'Avoiding a core skill limits what you can be given and how you\'re seen.'],
+      ['Teach yourself with online tutorials this week.', 3, 'Proactive, though the team\'s own way of using it may differ.'],
+    ],
+  },
+  {
+    id: 'pro-slide-template', sec: 'pro', comp: 'initiative', t: 'The same slides, every time',
+    s: 'You notice that every engagement rebuilds the same set of slides from scratch.',
+    r: [
+      ['Propose a shared template to your manager and offer to build the first version.', 4, 'A concrete improvement with an offer to do the work is exactly what firms reward.'],
+      ['Keep rebuilding them; that\'s how things are done.', 2, 'Reliable, but it misses an obvious saving.'],
+      ['Complain to colleagues that the firm is inefficient.', 1, 'Complaining without proposing anything changes nothing and spreads negativity.'],
+      ['Build yourself a personal template.', 3, 'Saves you time; sharing it would help the whole team.'],
+    ],
+  },
+  {
+    id: 'pro-fraud-signal', sec: 'pro', comp: 'initiative', t: 'Something outside your area',
+    s: 'While testing a client\'s data on an audit, you notice something outside your area that might point to a fraud risk.',
+    r: [
+      ['Write down exactly what you saw and raise it with your senior straight away.', 4, 'Possible fraud must be escalated quickly and factually; it isn\'t yours to investigate alone.'],
+      ['Investigate it yourself in your spare time before telling anyone.', 2, 'Well meant, but it delays escalation and could tip off the client.'],
+      ['Ignore it; it isn\'t your area.', 1, 'Auditors must raise possible fraud wherever they see it.'],
+      ['Mention it at the end-of-week team catch-up.', 3, 'It gets raised, but possible fraud shouldn\'t wait days.'],
+    ],
+  },
+  {
+    id: 'pro-near-burnout', sec: 'pro', comp: 'resilience', t: 'Close to burning out',
+    s: 'You\'ve worked long hours for weeks during busy season and feel close to burning out.',
+    r: [
+      ['Talk to your manager or counsellor about your workload, and protect some time to recover.', 4, 'Raising it early lets the firm adjust before your health or work suffers.'],
+      ['Keep going and say nothing; busy season ends eventually.', 2, 'Sometimes it works, but it risks a crash at the worst moment.'],
+      ['Start missing deadlines without explanation.', 1, 'Unexplained missed deadlines damage trust and don\'t solve the workload.'],
+      ['Talk to a colleague or friend about how you feel.', 3, 'Support helps, though nothing changes unless someone who sets your workload knows.'],
+    ],
+  },
+  {
+    id: 'pro-rude-client', sec: 'pro', comp: 'resilience', t: 'A rude client contact',
+    s: 'A client contact is consistently rude to you in meetings.',
+    r: [
+      ['Stay professional, and tell your manager so they can decide whether to address it.', 4, 'You keep your composure, and the person responsible for the relationship can act.'],
+      ['Respond in the same tone.', 1, 'Matching rudeness escalates it and reflects badly on the firm.'],
+      ['Avoid speaking in meetings with them.', 2, 'Protects you short term, but your contribution suffers.'],
+      ['Stay professional and let it go.', 3, 'Composed, but if it continues your manager should know.'],
+    ],
+  },
+  {
+    id: 'pro-behind-schedule', sec: 'pro', comp: 'communication', t: 'A status update when you\'re behind',
+    s: 'Your manager asks for a quick status update on your workstream, which is behind schedule.',
+    r: [
+      ['Give an honest update: where it stands, why it\'s late, and your plan to catch up.', 4, 'Honest, concise and solution-focused: your manager can plan around it.'],
+      ['Say it\'s going fine and work late to catch up.', 1, 'Hiding a delay means it surfaces later, when it\'s harder to fix.'],
+      ['Explain the reasons for the delay in detail, without a plan.', 2, 'Honest, but your manager needs to know what happens next.'],
+      ['Say it\'s slightly behind and that you\'ll update them properly tomorrow.', 3, 'Honest, though a clear plan now would help them more.'],
+    ],
+  },
+  {
+    id: 'pro-earlier-deadline', sec: 'pro', comp: 'client', t: 'Two days earlier, please',
+    s: 'A client asks whether a report can arrive two days earlier than agreed. You don\'t think the team can do it at the right quality.',
+    r: [
+      ['Say you\'ll check with the engagement manager and come back today with what\'s realistic.', 4, 'Takes the request seriously without overpromising, and involves the person who decides.'],
+      ['Agree straight away to keep them happy.', 1, 'Committing the team without checking risks a rushed report or a missed promise.'],
+      ['Say no immediately.', 2, 'Honest, but there may be options, such as an early draft, that your manager would offer.'],
+      ['After checking with your manager, offer an early draft of the key findings.', 3, 'A useful compromise; just make sure it\'s agreed before you offer it.'],
+    ],
+  },
+  {
+    id: 'pro-client-gossip', sec: 'pro', comp: 'client', t: 'Gossip at a client dinner',
+    s: 'At a client dinner, the client\'s CFO starts telling you personal details about one of their colleagues.',
+    r: [
+      ['Politely steer the conversation to another topic.', 4, 'Keeps the relationship warm without joining in on gossip about someone who isn\'t there.'],
+      ['Join in to build rapport.', 1, 'Joining gossip about a client\'s staff can embarrass everyone and damage trust in you.'],
+      ['Listen without commenting.', 2, 'Neutral, but it lets an awkward conversation carry on.'],
+      ['Excuse yourself from the table for a moment.', 3, 'Avoids it, though a gentle change of subject is smoother.'],
+    ],
+  },
+  {
+    id: 'pro-small-requests', sec: 'pro', comp: 'priorities', t: 'Death by small requests',
+    s: 'Your days fill up with small requests from the team, and your main analysis keeps slipping.',
+    r: [
+      ['Plan your day around the main analysis, batch the small requests, and tell people when you\'ll get to them.', 4, 'Protects the important work while staying responsive and open about timing.'],
+      ['Deal with each request as it arrives.', 2, 'Helpful, but the main deliverable keeps slipping.'],
+      ['Ignore the small requests.', 1, 'Ignoring colleagues damages the team and the requests may matter.'],
+      ['Ask your manager to help you prioritise the requests.', 3, 'Sensible if it keeps happening, though you can often manage it yourself first.'],
+    ],
+  },
+  {
+    id: 'pro-two-offices', sec: 'pro', comp: 'teamwork', t: 'The other office is left out',
+    s: 'Your team is split across two offices, and the other office often isn\'t told about decisions.',
+    r: [
+      ['Suggest a short written summary after each meeting, and offer to send it.', 4, 'A simple, owned fix that keeps the whole team aligned.'],
+      ['Accept it; they can ask if they need something.', 1, 'People can\'t ask about decisions they don\'t know were made.'],
+      ['Forward them things when you remember.', 2, 'Helps sometimes, but it isn\'t reliable.'],
+      ['Raise the problem with your manager.', 3, 'Useful, especially with a suggested fix.'],
+    ],
+  },
+  {
+    id: 'pro-hours-pressure', sec: 'pro', comp: 'integrity', t: '"Don\'t record all your hours"',
+    s: 'Your manager asks the team not to record all the hours they work, so the engagement looks on budget.',
+    r: [
+      ['Record your hours accurately, and raise your concern with your manager, or the firm\'s ethics contact if needed.', 4, 'Accurate records matter for pricing, staffing and wellbeing; there are proper routes to raise concerns.'],
+      ['Under-record like everyone else.', 1, 'False time records hide real costs and are a breach of firm policy.'],
+      ['Record your hours accurately but say nothing.', 3, 'You stay honest, though the wider problem continues.'],
+      ['Record fewer hours, but keep a private note of the real ones.', 2, 'A private note doesn\'t fix the false official record.'],
+    ],
+  },
+
+  // ======================= MORE GENERAL =======================
+  {
+    id: 'gen-new-jargon', sec: 'gen', comp: 'learning', t: 'Lost in the jargon',
+    s: 'You\'ve rotated into a new team on your graduate scheme and don\'t understand much of the terminology.',
+    r: [
+      ['Keep a list of terms, ask colleagues about them at sensible moments, and read up in your own time.', 4, 'Structured, quick, and respectful of other people\'s time.'],
+      ['Nod along and hope it becomes clear.', 1, 'Pretending to understand leads to mistakes and makes it harder to ask later.'],
+      ['Ask about every unfamiliar term the moment you hear it, even mid-meeting.', 2, 'Curious, but constant interruptions disrupt meetings.'],
+      ['Look everything up yourself without asking anyone.', 3, 'Good independence, though some terms are team-specific and best explained by colleagues.'],
+    ],
+  },
+  {
+    id: 'gen-peer-feedback', sec: 'gen', comp: 'learning', t: 'Feedback from a peer',
+    s: 'A colleague at your level tells you that your emails are hard to follow.',
+    r: [
+      ['Thank them, ask for an example, and try a clearer structure.', 4, 'Feedback is valuable from anyone; asking for an example makes it usable.'],
+      ['Ignore it; they\'re not your manager.', 1, 'Good feedback doesn\'t need seniority, and dismissing it can sour the relationship.'],
+      ['Check with your manager whether others find the same.', 3, 'A reasonable sense check, though you could simply try improving first.'],
+      ['Thank them but change nothing.', 2, 'Polite, but nothing improves.'],
+    ],
+  },
+  {
+    id: 'gen-charity-event', sec: 'gen', comp: 'initiative', t: 'Someone to organise the charity event',
+    s: 'Your team is looking for someone to organise a charity event alongside their normal work.',
+    r: [
+      ['Volunteer if you can manage it with your workload, and agree the time with your manager.', 4, 'Taking initiative while being realistic about your main job is the ideal balance.'],
+      ['Volunteer, and let your normal work slip.', 1, 'Extra activities don\'t make up for missed core work.'],
+      ['Stay quiet; it isn\'t part of your job.', 2, 'Not wrong, but you miss a chance to contribute and build relationships.'],
+      ['Offer to help whoever leads it with smaller tasks.', 3, 'A good middle ground if you can\'t take on the whole thing.'],
+    ],
+  },
+  {
+    id: 'gen-signup-idea', sec: 'gen', comp: 'initiative', t: 'An idea for someone else\'s project',
+    s: 'You have an idea that could improve the customer sign-up process, but it isn\'t your project.',
+    r: [
+      ['Write it up briefly and share it with the project lead.', 4, 'Good ideas help most when they reach the person who can use them.'],
+      ['Keep it to yourself, since it isn\'t your project.', 2, 'Respects boundaries, but the idea is lost.'],
+      ['Change the sign-up page yourself.', 1, 'Changing someone else\'s live process without agreement can break things and trust.'],
+      ['Mention it to your manager and ask how best to raise it.', 3, 'Sensible route, though sharing directly with the lead is often fine.'],
+    ],
+  },
+  {
+    id: 'gen-tough-questions', sec: 'gen', comp: 'resilience', t: 'A presentation that went badly',
+    s: 'You presented to senior management and couldn\'t answer several of their tough questions.',
+    r: [
+      ['Follow up with the answers by email, and ask your manager how to prepare better next time.', 4, 'Closing the loop shows ownership, and asking for advice builds the skill.'],
+      ['Avoid presenting again.', 1, 'Avoiding it makes the next one harder and limits your growth.'],
+      ['Tell yourself it doesn\'t matter.', 2, 'Moving on is fine, but the open questions and the lessons are left behind.'],
+      ['Prepare much harder for your next presentation.', 3, 'Good resolve; answering the open questions now would complete it.'],
+    ],
+  },
+  {
+    id: 'gen-requirements-change', sec: 'gen', comp: 'resilience', t: 'Requirements changed halfway',
+    s: 'Halfway through a project, the requirements change and much of your work has to be redone.',
+    r: [
+      ['Ask what changed and why, then re-plan the work with your team.', 4, 'Understanding the reason lets you adapt well and avoid redoing it again.'],
+      ['Complain that the change wasn\'t thought through.', 1, 'Complaining doesn\'t help, and it may not be true.'],
+      ['Redo the work as quickly as possible without asking questions.', 3, 'Adaptable, but you might redo it the wrong way.'],
+      ['Keep the old version going in case they change their mind.', 2, 'Hedging wastes effort and splits your focus.'],
+    ],
+  },
+  {
+    id: 'gen-plain-language', sec: 'gen', comp: 'communication', t: 'Explaining tech to marketing',
+    s: 'You need to explain a technical issue to a colleague in the marketing team.',
+    r: [
+      ['Explain it in plain language with an example, and check they\'ve understood.', 4, 'Adapting to your audience and checking understanding is the core of good communication.'],
+      ['Use the technical terms; they can look them up.', 1, 'Putting the effort on the listener makes the message likely to fail.'],
+      ['Send them a link to the technical documentation.', 2, 'Accurate, but probably not what they need.'],
+      ['Give a simple summary and offer more detail if they want it.', 3, 'Clear and kind; checking they\'ve understood would complete it.'],
+    ],
+  },
+  {
+    id: 'gen-who-does-what', sec: 'gen', comp: 'communication', t: 'Who agreed to do what?',
+    s: 'After a meeting, nobody seems sure who agreed to do what.',
+    r: [
+      ['Send a short summary of actions, owners and deadlines, and ask people to correct anything.', 4, 'A clear written record turns a vague meeting into action.'],
+      ['Assume someone else will follow up.', 1, 'If everyone assumes that, nothing happens.'],
+      ['Ask the meeting organiser to send a summary.', 3, 'Helpful, though you could simply offer to do it.'],
+      ['Just do the actions you remember being yours.', 2, 'You do your part, but the rest may be dropped.'],
+    ],
+  },
+  {
+    id: 'gen-social-media', sec: 'gen', comp: 'client', t: 'A complaint on social media',
+    s: 'A member of the public complains about your organisation on social media. A colleague suggests you reply from your personal account.',
+    r: [
+      ['Explain you shouldn\'t reply personally, and pass it to the team that handles public comments.', 4, 'Public responses are best handled by the people trained and authorised to do it.'],
+      ['Reply from your own account defending the organisation.', 1, 'A personal, defensive reply can escalate things and breach social media policy.'],
+      ['Ignore it.', 2, 'Doesn\'t make things worse, but the complaint may go unanswered.'],
+      ['Reply politely from your own account, pointing them to the official complaints route.', 3, 'Helpful and polite, though many organisations prefer staff not to reply personally.'],
+    ],
+  },
+  {
+    id: 'gen-conflicting-managers', sec: 'gen', comp: 'priorities', t: 'Two managers, two instructions',
+    s: 'Two managers give you conflicting instructions about the same task.',
+    r: [
+      ['Point out the conflict to both, explain what each instruction means for the task, and ask them to agree.', 4, 'Surfaces the conflict openly so the people responsible can resolve it.'],
+      ['Follow whichever manager is more senior.', 2, 'Often what happens, but the other manager is left unaware.'],
+      ['Do a mix of both.', 1, 'Satisfies neither, and may produce something that doesn\'t work.'],
+      ['Ask your own line manager which to follow.', 3, 'A sensible route, though both managers should hear the outcome.'],
+    ],
+  },
+  {
+    id: 'gen-holiday-cover', sec: 'gen', comp: 'priorities', t: 'Covering a colleague\'s work',
+    s: 'You\'re covering a colleague\'s work while they\'re on holiday, and your own deadlines are tight.',
+    r: [
+      ['List both workloads, flag the clashes to your manager, and agree what can wait.', 4, 'Makes the trade-offs visible so the right things get done.'],
+      ['Do their work first; covering is a favour to them.', 2, 'Kind, but your own deadlines matter just as much.'],
+      ['Leave their work until they\'re back.', 1, 'Cover means the work continues; leaving it lets people down.'],
+      ['Do what you can of both, working late if needed.', 3, 'Committed, but not sustainable without your manager knowing.'],
+    ],
+  },
+  {
+    id: 'gen-director-praise', sec: 'gen', comp: 'teamwork', t: 'Praise from a director',
+    s: 'A director praises your team\'s project and thanks you personally.',
+    r: [
+      ['Thank them, and mention the colleagues who did key parts of the work.', 4, 'Gracious, and it makes sure credit reaches everyone who earned it.'],
+      ['Accept the praise.', 2, 'Fine, though the rest of the team goes unmentioned.'],
+      ['Accept it and add that you did most of the work.', 1, 'Claiming the credit undermines the team and is often noticed.'],
+      ['Say it was mostly the others\' work, even though you did a lot of it.', 3, 'Generous, though it\'s fine to accept your share too.'],
+    ],
+  },
 ];
 
 // ---------------- scoring (shared with the tests) ----------------

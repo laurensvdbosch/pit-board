@@ -55,3 +55,22 @@ insert into public.pb_blocked_words (word, whole) values ('someword', true) on c
 
 -- Existing names the current filter would now reject (new words only apply to new names)
 select name, hidden from public.players where not public.pb_name_ok(name) order by name;
+
+
+-- ---------- SJT "I disagree" flags ----------
+
+-- Which scenarios get flagged most (scenario ids are the ones in sjt-bank.js)
+select scenario, count(*) as flags, max(created_at) as latest
+from public.sjt_flags
+group by scenario
+order by flags desc, latest desc;
+
+-- The latest flags with comments. response_text is the response they disagreed with
+-- (empty = the scenario as a whole); suggested is the rating they'd give it (1-4)
+select created_at, scenario, response_text, suggested, note
+from public.sjt_flags
+order by created_at desc
+limit 50;
+
+-- Clear the flags for a scenario once you've dealt with it
+delete from public.sjt_flags where scenario = 'fin-model-error';
