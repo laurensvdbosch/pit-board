@@ -12,6 +12,8 @@
    - mdrill:    speed drill, difficulty standard, rounds 120 (only standard settings are ranked)
    - msheet:    answer sheet, difficulty regular | assess | quant, rounds = questions 10/20/50
    - mquiz:     multiple choice, difficulty easy | medium | hard | quant, rounds 20   (section: 'math')
+   - pzl:       Puzzles interview round, difficulty standard, rounds 5 (section: 'puzzles';
+                the puzzle library, pzlib, has no board)
    - pkodds / pkshow / pkspot / pkread: poker puzzles, difficulty standard,
      rounds = 180 / 90 seconds or 10 questions (section: 'poker')
                 (difficulty 'standard' was the retired odd-one-out version)
@@ -181,12 +183,22 @@ function renderLobby() {
   $('gameList').innerHTML = lobbyRows(undefined);
   $('mathList').innerHTML = lobbyRows('math');
   $('oddsList').innerHTML = lobbyRows('odds');
+  $('puzzlesList').innerHTML = lobbyRows('puzzles');
   if (typeof Online !== 'undefined') Online.homeExtras();
   renderSection();
 }
 
 function lobbyRows(section) {
   return Object.entries(GAMES).filter(([, g]) => g.section === section).map(([id, g]) => {
+    if (g.status) {   // games without a board show their own progress
+      const st = g.status();
+      return `
+      <button class="book-row" data-game="${id}">
+        <span class="badge" style="--c:${g.color}">${g.sym}</span>
+        <span class="book-name"><b>${g.name}</b><small>${g.blurb}</small></span>
+        <span class="book-best">${st.text}<small>${st.sub}</small></span>
+      </button>`;
+    }
     const b = currentBoard(id);
     const best = store.get(boardBestKey(b), null);
     const variant = boardLabel(b).split(' · ').slice(1).join(' · ');
@@ -199,7 +211,7 @@ function lobbyRows(section) {
   }).join('');
 }
 
-// Math, trading, odds or poker, remembered between visits
+// Math, trading, odds, puzzles or poker, remembered between visits
 function renderSection() {
   const poker = settings.section === 'poker';
   $('mathSection').hidden = settings.section !== 'math';
@@ -213,6 +225,7 @@ function renderSection() {
     : 'Choose your own pace and difficulty.';
   $('tradingSection').hidden = settings.section !== 'trading';
   $('oddsSection').hidden = settings.section !== 'odds';
+  $('puzzlesSection').hidden = settings.section !== 'puzzles';
   $('pokerSection').hidden = !poker;
   $('sectionSwitch').querySelectorAll('button').forEach(b => {
     const on = b.dataset.value === settings.section;
@@ -291,7 +304,7 @@ $('mathModeSwitch').addEventListener('click', e => {
   saveSettings();
   renderLobby();
 });
-['gameList', 'mathList', 'oddsList'].forEach(list => $(list).addEventListener('click', e => {
+['gameList', 'mathList', 'oddsList', 'puzzlesList'].forEach(list => $(list).addEventListener('click', e => {
   const row = e.target.closest('[data-game]');
   if (row) openGame(row.dataset.game);
 }));

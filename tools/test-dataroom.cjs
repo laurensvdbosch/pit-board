@@ -14,7 +14,7 @@ for (const level of ['standard', 'hard']) {
     const run = DataGen.run(level);
     if (run.length !== 20) bad(`run has ${run.length} questions`);
     const kinds = new Set(run.map(q => q.exhibit.kind));
-    if (kinds.size !== 6) bad(`run has ${kinds.size} exhibit kinds`);
+    if (kinds.size !== 8) bad(`run has ${kinds.size} exhibit kinds`);
     for (const q of run) {
       templates.add(q.text.replace(/[0-9,.$%]+/g, '#').replace(/\b[A-Z]{3,4}\b/g, 'X').slice(0, 30));
       lengths.push(q.text.length);

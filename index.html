@@ -28,11 +28,12 @@
     </div>
     <div class="tape-strip" aria-hidden="true"><div class="tape-track" id="brandTape"></div></div>
 
-    <div class="seg seg-4 section-switch" id="sectionSwitch">
-      <button data-value="math">🧮 Math</button>
-      <button data-value="trading">📈 Trading</button>
-      <button data-value="odds">🎲 Odds</button>
-      <button data-value="poker">♠️ Poker</button>
+    <div class="seg seg-5 section-switch" id="sectionSwitch">
+      <button data-value="math"><span class="ic" aria-hidden="true">🧮</span>Math</button>
+      <button data-value="trading"><span class="ic" aria-hidden="true">📈</span>Trading</button>
+      <button data-value="odds"><span class="ic" aria-hidden="true">🎲</span>Odds</button>
+      <button data-value="puzzles"><span class="ic" aria-hidden="true">🧩</span>Puzzles</button>
+      <button data-value="poker"><span class="ic" aria-hidden="true">♠️</span>Poker</button>
     </div>
 
     <div class="home-section" id="mathSection" hidden>
@@ -70,6 +71,15 @@
         <div id="oddsList"></div>
       </div>
       <button class="btn btn-ghost btn-leaders" id="oddsLeadersBtn">🏆 Odds leaderboards</button>
+    </div>
+
+    <div class="home-section" id="puzzlesSection" hidden>
+      <div class="book">
+        <div class="book-head"><span>Sym</span><span>Brainteasers</span><span>Progress</span></div>
+        <div id="puzzlesList"></div>
+      </div>
+      <button class="btn btn-ghost btn-leaders" id="puzzlesLeadersBtn">🏆 Puzzle leaderboard</button>
+      <p class="bt-credit">Many of these are classic quant interview puzzles, written up in our own words. For a large free collection, see <a href="https://brainstellar.com" target="_blank" rel="noopener">Brainstellar</a>.</p>
     </div>
 
     <div class="home-section" id="pokerSection" hidden>
@@ -870,6 +880,63 @@
     </div>
   </section>
 
+  <!-- ==================== PUZZLES ==================== -->
+  <section id="btLib" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">LIBR · Puzzle library</div>
+      <div class="bt-count" id="btLibCount"></div>
+    </header>
+    <div class="setup-body">
+      <div class="bt-filters" id="btLibFilters"></div>
+      <div class="bt-list" id="btLibList"></div>
+      <p class="bt-credit">Puzzles marked “also on Brainstellar” are classics you can find there too: <a href="https://brainstellar.com" target="_blank" rel="noopener">brainstellar.com</a>.</p>
+    </div>
+  </section>
+
+  <section id="btView" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="btViewBack" aria-label="Back to the library">←</button>
+      <div class="round-indicator" id="btViewTitle"></div>
+      <div class="bt-count" id="btViewPos"></div>
+    </header>
+    <div class="bt-body" id="btViewBody"></div>
+  </section>
+
+  <section id="btSetup" class="screen" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-back aria-label="Back to games">←</button>
+      <div class="round-indicator">INTV · Interview round</div>
+    </header>
+    <div class="setup-body">
+      <p class="field-help">Five brainteasers, one at a time, each against its own clock. Tick the levels you want; harder puzzles are worth more.</p>
+      <div class="bt-filters" id="btSetupFilters"></div>
+      <p class="field-help" id="btSetupPool"></p>
+      <div class="best-line" id="btBest"></div>
+      <button class="btn btn-primary btn-start" id="btStart">Start</button>
+      <button class="btn btn-ghost btn-leaders" id="btLeaders">🏆 Leaderboard</button>
+      <details class="howto">
+        <summary>How it works</summary>
+        <div><ul>
+          <li>Time per puzzle: Easy 3 min, Medium 5, Hard 7, Expert 10.</li>
+          <li>Number answers: type a number, fraction or percentage (2/3, 0.667 and 66.7% all work), within 1%. You get 3 tries. Choice answers get one try.</li>
+          <li>Points: Easy 10, Medium 20, Hard 30, Expert 40. A hint costs 40%, a second try 40% and a third try 70%, and a slow answer up to 25%.</li>
+          <li>One leaderboard for all levels, so harder rounds can score higher, but a miss scores nothing.</li>
+          <li>Puzzles you explain in words, rather than answer with a number or a choice, are only in the library.</li>
+        </ul></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="btPlay" class="screen" hidden>
+    <header class="topbar ms-top">
+      <button class="icon-btn" id="btQuit" aria-label="Quit round">✕</button>
+      <div class="round-indicator" id="btInfo"></div>
+      <div class="timer" id="btTimer"></div>
+    </header>
+    <div class="bt-body" id="btPlayBody"></div>
+  </section>
+
   <!-- ==================== ODDS ==================== -->
   <section id="odSetup" class="screen" hidden>
     <header class="topbar">
@@ -1034,6 +1101,8 @@
 <script src="prob-bank.js"></script>
 <script src="odds-engine.js"></script>
 <script src="odds.js"></script>
+<script src="puzzle-bank.js"></script>
+<script src="puzzles.js"></script>
 <script src="digits.js"></script>
 <script src="switch.js"></script>
 <script src="confirm.js"></script>

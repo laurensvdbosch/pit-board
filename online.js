@@ -269,7 +269,7 @@ const Online = (() => {
   // Game picker plus that game's own filters
   function renderFilters() {
     const section = GAMES[lb.mode].section || 'trading';
-    const picker = Object.entries(GAMES).filter(([, g]) => (g.section || 'trading') === section);
+    const picker = Object.entries(GAMES).filter(([, g]) => (g.section || 'trading') === section && !g.noBoard);
     $('lbFilters').innerHTML = `
       <div class="seg seg-${picker.length > 4 ? 3 : picker.length}" data-lb="mode">${picker.map(([id, g]) => `<button data-value="${id}">${g.short}</button>`).join('')}</div>
       ${GAMES[lb.mode].filters.map(f => `

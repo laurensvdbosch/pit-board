@@ -35,7 +35,7 @@ alter table public.best_scores drop constraint if exists best_scores_mode_check;
 alter table public.best_scores drop constraint if exists best_scores_difficulty_check;
 alter table public.best_scores drop constraint if exists best_scores_rounds_check;
 alter table public.best_scores add constraint best_scores_mode_check
-  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'conv', 'data', 'prob', 'take', 'bank', 'next', 'urn', 'likely', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'));
+  check (mode in ('arb', 'mm', 'digits', 'switch', 'confirm', 'series', 'matrix', 'conv', 'data', 'prob', 'take', 'bank', 'next', 'urn', 'likely', 'pzl', 'mdrill', 'msheet', 'mquiz', 'pkodds', 'pkshow', 'pkspot', 'pkread'));
 alter table public.best_scores add constraint best_scores_difficulty_check
   check (difficulty in ('easy', 'medium', 'hard', 'expert', 'fwd-easy', 'fwd-hard', 'bwd-easy', 'bwd-hard', 'standard', 'super', 'nextval', 'test', 'survival', 'regular', 'assess', 'quant', 'gk-easy', 'gk-hard', 'fin-easy', 'fin-hard', 'fin-quant', 'mix'));
 alter table public.best_scores add constraint best_scores_rounds_check
@@ -175,6 +175,8 @@ begin
           and p_rounds = 10 and v_score = trunc(v_score) and v_score between 0 and 100)
     or (p_mode = 'likely' and p_difficulty = 'standard'
           and p_rounds = 0 and v_score = trunc(v_score) and v_score between 0 and 2000)
+    or (p_mode = 'pzl' and p_difficulty = 'standard'
+          and p_rounds = 5 and v_score = trunc(v_score) and v_score between 0 and 200)
     or (p_mode = 'mdrill' and p_difficulty = 'standard'
           and p_rounds = 120 and v_score = trunc(v_score) and v_score between 0 and 400)
     or (p_mode = 'msheet' and p_difficulty in ('regular', 'assess', 'quant')

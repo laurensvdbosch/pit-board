@@ -5,7 +5,9 @@
    read an exhibit, answer from 5 options, calculator allowed. Move freely
    between questions, change answers, nothing is marked until you hand in.
    +1 per correct. Board (data, standard|hard, 20).
-   Exhibits are generated, so every run has new numbers.
+   Exhibits are generated, so every run has new numbers. Two of them pair
+   a chart with a table (workforce, sales split), as in SHL-style tests:
+   some questions need one exhibit, some need both, and the rest is noise.
 
    TO REMOVE THIS GAME: delete this file and its <script> line in
    index.html (and tools/test-dataroom.cjs). Everything else stays working;
@@ -340,7 +342,108 @@ const DataGen = (() => {
     return { kind: 'Line chart', title: 'Month-end share prices ($)', html: lineChart(months, names.map((n, i) => ({ name: n, values: v[i] })), lo, hi), s, h };
   }
 
-  const EXHIBITS = [revenueTable, unitsChart, allocation, fxTable, deskTable, priceChart];
+  // ---------- Paired exhibits: a chart and a table, and only some questions need both ----------
+  const GBP2 = { pre: '£', dp: 2 };
+  const GBP0 = { pre: '£', dp: 0 };
+  const GBPK = { pre: '£', suf: 'k', dp: 0 };
+  const sub = s => `<div class="dr-title dr-sub">${s}</div>`;
+
+  function workforce(hard) {
+    const sector = P([
+      ['Technology', ['Network Engineers', 'Security Analysts', 'System Architects', 'Database Admins', 'Data Scientists']],
+      ['Healthcare', ['Nurses', 'Pharmacists', 'Radiographers', 'Paramedics', 'Physiotherapists']],
+      ['Construction', ['Electricians', 'Plumbers', 'Surveyors', 'Site Managers', 'Carpenters']],
+    ]);
+    const roles = sample(sector[1], 3);
+    const years = ['Year 1', 'Year 2', 'Year 3', 'Year 4'];
+    const n = roles.map(() => { let x = R(16, 90) * 5; return years.map(() => { const v = Math.max(40, Math.round(x / 5) * 5); x *= 0.84 + rnd() * 0.36; return v; }); });   // thousands
+    const rate = roles.map(() => (hard ? R(1450, 5600) / 100 : R(30, 110) / 2));   // £ per hour
+    const tot = j => total(n.map(r => r[j]));
+    const bill = (i, j) => n[i][j] * rate[i];   // £000 per hour
+    const gbp = v => `£${num(v, 2)}`;
+    const pick = () => R(0, 2), yr = () => R(0, 3);
+    const order = () => { const [a, b] = sample([0, 1, 2], 2); return rate[a] < rate[b] ? [a, b] : [b, a]; };   // lower paid first
+    const s = [
+      () => { const [a, b] = order(), p = P([5, 10, 15, 20, 25]); const v = rate[b] - rate[a] * (1 + p / 100); if (v < 0.5) return null;
+        return N(`If a ${p}% pay rise were given to all ${roles[a]}, how much less per hour would they earn than ${roles[b]}?`, v, GBP2,
+          [rate[b] - rate[a], (rate[b] - rate[a]) * (1 - p / 100), rate[a] * p / 100, rate[b] - rate[a] * (1 - p / 100)], `${gbp(rate[a])} × ${1 + p / 100} = ${gbp(rate[a] * (1 + p / 100))}, then ${gbp(rate[b])} minus that. The headcount chart isn't needed.`); },
+      () => { const i = pick(), a = R(0, 2), b = R(a + 1, 3), A = n[i][a], B = n[i][b]; if (A === B) return null;
+        return N(`By what percentage did the number of ${roles[i]} ${B > A ? 'rise' : 'fall'} from ${years[a]} to ${years[b]}? (1 d.p.)`, Math.abs(B - A) / A * 100, PCT, [Math.abs(B - A) / B * 100, B / A * 100, Math.abs(B - A) / 10], `(${B} − ${A}) ÷ ${A} × 100.`); },
+      () => { const [a, b] = order(); return N(`How much more per hour do ${roles[b]} earn than ${roles[a]}?`, rate[b] - rate[a], GBP2, [rate[b] + rate[a], (rate[b] - rate[a]) * 1.1, rate[b] / rate[a]], `${gbp(rate[b])} − ${gbp(rate[a])}.`); },
+      () => { const j = yr(); return N(`How many people worked in these three roles in ${years[j]}? (thousands)`, tot(j), K, [tot((j + 1) % 4), tot(j) - n[0][j], tot(j) + n[1][j]], `${n.map(r => r[j]).join(' + ')}.`); },
+      () => { const w = winner(years, years.map((_, j) => tot(j)), 10); if (!w) return null;
+        return C('In which year did the most people work in these three roles?', years, w, 'Add the three bars in each year.'); },
+    ];
+    const h = [
+      () => { const i = pick(), j = yr(); return N(`What was the combined hourly pay of all ${roles[i]} in ${years[j]}? (£000 per hour)`, bill(i, j), GBPK,
+          [n[i][(j + 1) % 4] * rate[i], n[i][j] * rate[(i + 1) % 3], bill(i, j) * 1.1], `${n[i][j]}k people × ${gbp(rate[i])} = £${num(bill(i, j))}k per hour. Needs both exhibits.`); },
+      () => { const j = yr(); const avg = total(n.map((r, i) => r[j] * rate[i])) / tot(j); const simple = total(rate) / 3; if (Math.abs(avg - simple) < 0.6) return null;
+        return N(`What was the average hourly rate across everyone in these three roles in ${years[j]}? (2 d.p.)`, avg, GBP2, [simple, total(n.map((r, i) => r[(j + 2) % 4] * rate[i])) / tot((j + 2) % 4) + 0.35], `Total hourly pay ÷ total people. The simple average of the three rates (${gbp(simple)}) ignores how many work in each role.`); },
+      () => { const i = pick(), p = P([4, 6, 8, 12, 15]); return N(`If all ${roles[i]} got a ${p}% pay rise in ${years[3]}, how much would their combined hourly pay go up? (£000 per hour)`, bill(i, 3) * p / 100, { pre: '£', suf: 'k', dp: 1 },
+          [rate[i] * p / 100, bill(i, 3) * (1 + p / 100), n[i][2] * rate[i] * p / 100], `${n[i][3]}k × ${gbp(rate[i])} × ${p}%.`); },
+      () => { const i = pick(), j = yr(); return N(`In ${years[j]}, what percentage of people in these three roles were ${roles[i]}? (1 d.p.)`, n[i][j] / tot(j) * 100, PCT, [n[i][j] / (tot(j) - n[i][j]) * 100, 100 - n[i][j] / tot(j) * 100], `${n[i][j]} ÷ ${tot(j)} × 100.`); },
+      () => { const [x, y] = sample([0, 1, 2], 2), j = yr(); const r = bill(x, j) / bill(y, j); if (Math.abs(r - n[x][j] / n[y][j]) < 0.05) return null;
+        return N(`In ${years[j]}, how many times larger was the combined hourly pay of ${roles[x]} than of ${roles[y]}? (2 d.p.)`, r, { dp: 2 }, [n[x][j] / n[y][j], rate[x] / rate[y], 1 / r], `(${n[x][j]} × ${gbp(rate[x])}) ÷ (${n[y][j]} × ${gbp(rate[y])}).`); },
+    ];
+    return {
+      kind: 'Chart + table',
+      title: `${sector[0]} workforce`,
+      html: `${sub('Employees by role (thousands)')}${barChart(years, roles.map((r, i) => ({ name: r, values: n[i] })))}${sub('Hourly rate of pay (Years 1–4)')}${table(['Role', 'Hourly rate'], roles.map((r, i) => [r, gbp(rate[i])]))}`,
+      s, h,
+    };
+  }
+
+  function salesSplit(hard) {
+    const theme = P([
+      ['Publisher', 'books', 'Book', ['Romance', 'Crime', 'Sci-fi', 'Biography', 'Cookery', "Children's", 'Travel', 'History'], ['Author fees', 'Editing', 'Printing', 'Distribution', 'Marketing']],
+      ['Games studio', 'games', 'Game', ['Puzzle', 'Racing', 'Strategy', 'Sports', 'Adventure', 'Simulation', 'Party', 'Horror'], ['Developer pay', 'Licences', 'Testing', 'Hosting', 'Marketing']],
+      ['Coffee roaster', 'bags', 'Coffee', ['Espresso', 'House blend', 'Decaf', 'Single origin', 'Cold brew', 'Organic', 'Flavoured', 'Filter'], ['Staff', 'Green beans', 'Packaging', 'Delivery', 'Marketing']],
+    ]);
+    const [biz, unitWord, label, catPool, costNames] = theme;
+    const cats = sample(catPool, 6);
+    const shares = (() => { for (;;) { const v = cats.slice(1).map(() => R(5, 26)); const last = 100 - total(v); if (last >= 5 && last <= 30) return [...v, last]; } })();
+    const yrs = ['Year 1', 'Year 2', 'Year 3'];
+    const step = hard ? 1 : 10;
+    const sales = []; let x = R(150, 420) * 10;
+    for (let j = 0; j < 3; j++) { sales.push(Math.round(x / step) * step); x *= 0.95 + rnd() * 0.45; }
+    const costs = costNames.map(() => { const f = 0.02 + rnd() * 0.11; return sales.map(sv => Math.max(5, Math.round(sv * f * (0.85 + rnd() * 0.3) / (hard ? 1 : 5)) * (hard ? 1 : 5))); });
+    const price = hard ? R(9, 29) + 0.99 : R(3, 6) * 5;
+    const ct = j => total(costs.map(c => c[j]));
+    const profit = j => sales[j] - ct(j);
+    const S3 = sales[2] * 1000;
+    const pound = v => `£${num(v)}`;
+    const ci = () => R(0, 5), yr = () => R(0, 2);
+    const pair = () => sample([0, 1, 2, 3, 4, 5], 2);
+    const s = [
+      () => { const [a, b] = pair(); const c = [0, 1, 2, 3, 4, 5].find(k => k !== a && k !== b); return N(`Approximately how much was made from ${cats[a]} and ${cats[b]} ${unitWord} combined in Year 3?`, S3 * (shares[a] + shares[b]) / 100, GBP0,
+          [S3 * shares[a] / 100, S3 * shares[b] / 100, S3 * (shares[a] + shares[b] + shares[c]) / 100, sales[1] * 1000 * (shares[a] + shares[b]) / 100], `(${shares[a]}% + ${shares[b]}%) × £${num(sales[2])}k = ${shares[a] + shares[b]}% × ${pound(S3)}. The table is in £000s.`); },
+      () => { const j = yr(); return N(`What were total costs in ${yrs[j]}? (£000)`, ct(j), GBPK, [ct((j + 1) % 3), ct(j) - costs[0][j], sales[j] - ct(j)], `${costs.map(c => c[j]).join(' + ')}.`); },
+      () => { const j = yr(); if (profit(j) <= 0) return null; return N(`What was the profit (sales minus all costs) in ${yrs[j]}? (£000)`, profit(j), GBPK, [sales[j] - ct(j) + costs[4][j], profit((j + 1) % 3), sales[j] - costs[4][j]], `£${num(sales[j])}k − £${num(ct(j))}k.`); },
+      () => { const a = R(0, 1), b = R(a + 1, 2), A = sales[a], B = sales[b]; if (A === B) return null; return N(`By what percentage did sales ${B > A ? 'rise' : 'fall'} from ${yrs[a]} to ${yrs[b]}? (1 d.p.)`, Math.abs(B - A) / A * 100, PCT, [Math.abs(B - A) / B * 100, B / A * 100], `(${num(B)} − ${num(A)}) ÷ ${num(A)} × 100.`); },
+      () => { const [a, b] = pair(); if (shares[a] === shares[b]) return null; const hi = shares[a] > shares[b] ? a : b, lo = hi === a ? b : a;
+        return N(`In Year 3, how much more was made from ${cats[hi]} than from ${cats[lo]}?`, S3 * (shares[hi] - shares[lo]) / 100, GBP0, [S3 * shares[hi] / 100, sales[1] * 1000 * (shares[hi] - shares[lo]) / 100, S3 * (shares[hi] + shares[lo]) / 100], `(${shares[hi]}% − ${shares[lo]}%) × ${pound(S3)}.`); },
+    ];
+    const h = [
+      () => { const i = ci(); return N(`Approximately how many ${cats[i]} ${unitWord} were sold in Year 3, at the average price?`, S3 * shares[i] / 100 / price, COUNT,
+          [S3 / price, S3 * shares[i] / 100 / price * 1.1, S3 * (100 - shares[i]) / 100 / price], `${shares[i]}% × ${pound(S3)} ÷ £${num(price, hard ? 2 : 0)}.`); },
+      () => { const j = yr(); if (profit(j) <= 0) return null; return N(`What was the profit margin (profit as a percentage of sales) in ${yrs[j]}? (1 d.p.)`, profit(j) / sales[j] * 100, PCT,
+          [profit(j) / ct(j) * 100, ct(j) / sales[j] * 100, profit((j + 1) % 3) / sales[(j + 1) % 3] * 100], `(${num(sales[j])} − ${num(ct(j))}) ÷ ${num(sales[j])} × 100.`); },
+      () => { const k = R(0, 4); const a = costs[k][0] / sales[0] * 100, b = costs[k][2] / sales[2] * 100; if (Math.abs(b - a) < 0.3) return null;
+        return N(`By how many percentage points did ${costNames[k]} as a share of sales ${b > a ? 'rise' : 'fall'} from Year 1 to Year 3? (1 d.p.)`, Math.abs(b - a), { suf: ' pts', dp: 1 }, [Math.abs(costs[k][2] - costs[k][0]) / costs[k][0] * 100, Math.abs(b - a) * 1.5 + 0.5], `Year 3: ${num(costs[k][2])} ÷ ${num(sales[2])} = ${b.toFixed(1)}%. Year 1: ${a.toFixed(1)}%. Points, not percent change.`); },
+      () => { const w = winner(costNames, costs.map(c => (c[2] - c[0]) / c[0]), 0.04); if (!w) return null;
+        return C('Which cost grew the most in percentage terms from Year 1 to Year 3?', costNames, w, 'Compare (Year 3 − Year 1) ÷ Year 1 for each cost line; the biggest cost in pounds may not have grown fastest.'); },
+      () => { const j = yr(), p = P([5, 10, 15, 20]); return N(`If every cost had been ${p}% lower in ${yrs[j]}, what would the profit have been? (£000)`, sales[j] - ct(j) * (1 - p / 100), { ...GBPK, signed: true },
+          [profit(j) * (1 + p / 100), sales[j] * (1 - p / 100) - ct(j), profit(j) + sales[j] * p / 100], `£${num(sales[j])}k − £${num(ct(j))}k × ${1 - p / 100}.`); },
+    ];
+    return {
+      kind: 'Table + chart',
+      title: `${biz}: sales and costs`,
+      html: `${sub('Sales and costs (£000)')}${table(['£000', ...yrs], [['Sales', ...sales.map(v => num(v))], ...costNames.map((c, k) => [c, ...costs[k].map(v => num(v))])])}<p class="dr-note">Average ${label.toLowerCase()} price (all years): £${num(price, hard ? 2 : 0)}</p>${sub('Share of Year 3 sales')}${hBars(cats, [{ name: 'Year 3', values: shares }])}`,
+      s, h,
+    };
+  }
+
+  const EXHIBITS = [revenueTable, unitsChart, allocation, fxTable, deskTable, priceChart, workforce, salesSplit];
 
   // Pick `count` questions from a fresh exhibit
   function fromExhibit(make, hard, count) {
@@ -361,11 +464,11 @@ const DataGen = (() => {
     throw new Error('Could not build exhibit questions');
   }
 
-  // 20 questions: every exhibit type once, two of them get a fourth question
+  // 20 questions: every exhibit type once, four of them get a third question
   function run(level, source) {
     rnd = source || Math.random;
     const hard = level === 'hard';
-    const counts = shuffled([4, 4, 3, 3, 3, 3]);
+    const counts = shuffled([3, 3, 3, 3, 2, 2, 2, 2]);
     return shuffled(EXHIBITS).flatMap((make, i) => fromExhibit(make, hard, counts[i]));
   }
 
@@ -408,6 +511,8 @@ if (typeof document !== 'undefined') (() => {
     .dr-strip button.cur{ border-color: var(--chalk); box-shadow: 0 0 0 1px var(--chalk); }
     .dr-exhibit{ background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); padding: 10px; }
     .dr-title{ font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .dr-sub{ font-size: 12px; color: var(--chalk-dim); margin: 12px 0 6px; }
+    .dr-sub:first-child{ margin-top: 0; }
     .dr-svg{ display: block; width: 100%; height: auto; font-family: var(--mono); }
     .dr-legend{ display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: #CFCCC5; margin-bottom: 4px; }
     .dr-legend span{ display: inline-flex; align-items: center; gap: 5px; }
