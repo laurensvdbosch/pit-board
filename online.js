@@ -90,6 +90,14 @@ const Online = (() => {
     store.set('pitboard-pending', queue);
   }
 
+  // Server refusals for a name, and what to tell the player
+  const NAME_ERRORS = {
+    name_taken: 'That name is taken — try another.',
+    invalid_name: 'That name isn\'t allowed — try another.',
+    blocked_name: 'That name isn\'t allowed on the public leaderboard — try another.',
+    too_many: 'Too many new names from this network in the last hour — try again later.',
+  };
+
   function setError(msg) {
     $('registerError').textContent = msg;
     $('registerError').hidden = !msg;
@@ -128,9 +136,9 @@ const Online = (() => {
         await ensureRegistered();
       }
     } catch (err) {
-      if (err.message === 'name_taken' || err.message === 'invalid_name') {
+      if (NAME_ERRORS[err.message]) {
         if (registerMode === 'join') { profile = null; saveProfile(); }
-        setError(err.message === 'name_taken' ? 'That name is taken — try another.' : 'That name isn\'t allowed — try another.');
+        setError(NAME_ERRORS[err.message]);
         return;
       }
       if (registerMode === 'rename') {
@@ -152,11 +160,11 @@ const Online = (() => {
       try {
         await ensureRegistered();
       } catch (err) {
-        if (err.message === 'name_taken' || err.message === 'invalid_name') {
-          // Someone claimed the name while this device was offline: ask again next time home shows
+        if (NAME_ERRORS[err.message]) {
+          // The name was claimed (or refused) while this device was offline: ask again next time home shows
           profile = null;
           saveProfile();
-          if ($('game').hidden) showRegister('join', 'Someone claimed that name first — pick another.');
+          if ($('game').hidden) showRegister('join', err.message === 'name_taken' ? 'Someone claimed that name first — pick another.' : NAME_ERRORS[err.message]);
         }
         return;
       }
