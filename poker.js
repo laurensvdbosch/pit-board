@@ -398,6 +398,18 @@ const PokerUI = (() => {
     updateRaiseLabel(T.game.legal());
   });
   $('pkRaiseGo').addEventListener('click', () => humanAct('raise', T.raiseTo));
+  // Keyboard (desktop): F fold, C check/call, R open the raise, Enter confirm it or deal the next hand
+  document.addEventListener('keydown', e => {
+    if ($('pokerTable').hidden || e.ctrlKey || e.metaKey || e.altKey || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+    const press = sel => { const b = document.querySelector(sel); if (b && !b.disabled && !b.closest('[hidden]')) { b.click(); return true; } return false; };
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    let used = false;
+    if (k === 'f') used = press('#pkActions [data-a="fold"]');
+    else if (k === 'c') used = press('#pkActions [data-a="call"]') || press('#pkActions [data-a="check"]');
+    else if (k === 'r') used = press('#pkActions [data-a="open-raise"]');
+    else if (k === 'Enter') used = press('#pkNext') || press('#pkCoachNext') || (!$('pkRaise').hidden && press('#pkRaiseGo'));
+    if (used) e.preventDefault();
+  });
   save();
   if (!$('pokerSection').hidden) renderHub();
 

@@ -879,6 +879,24 @@ document.querySelectorAll('.seg[data-setting]').forEach(seg => {
     renderTradeSetup();
   });
 });
+// Keyboard (desktop): arbitrage Enter/R/P/H, market making arrows and A S K L, Enter for the next round
+document.addEventListener('keydown', e => {
+  if ($('game').hidden || e.ctrlKey || e.metaKey || e.altKey || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+  const press = sel => { const b = document.querySelector(sel); if (b && !b.disabled && !b.closest('[hidden]')) { b.click(); return true; } return false; };
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  let used = false;
+  if (!$('roundSheet').hidden) used = k === 'Enter' && press('#nextBtn');
+  else if (!$('arbView').hidden) {
+    const arb = { Enter: '#submitBtn', r: '#resetBtn', p: '#passBtn', h: '#arbHintBtn' }[k];
+    used = arb ? press(arb) : false;
+  }
+  else if (!$('mmView').hidden) {
+    const mm = { ArrowLeft: 'shift-', ArrowRight: 'shift+', a: 'bid-', s: 'bid+', k: 'ask-', l: 'ask+' }[k];
+    used = mm ? press(`#mmView [data-mm="${mm}"]`) : k === 'h' ? press('#mmHintBtn') : false;
+  }
+  if (used) e.preventDefault();
+});
+
 $('startBtn').addEventListener('click', startSession);
 $('quitBtn').addEventListener('click', quitSession);
 $('board').addEventListener('click', onBoardClick);
